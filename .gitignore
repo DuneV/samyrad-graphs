@@ -1,0 +1,21 @@
+# --- Entornos Virtuales y Caché ---
+__pycache__/
+.venv/
+b/
+
+# --- Salidas y Resultados de Video ---
+output/
+*.mp4
+*.avi
+
+# --- Datos Numéricos y Archivos de MediaPipe/Modelos ---
+*.npy
+*.task
+
+# --- Pesos de Modelos (YOLO / Ultralytics) ---
+*.pt
+*.onnx
+
+# --- Configuraciones de Editores Locales ---
+.claude/
+.vscode/
