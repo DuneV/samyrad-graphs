@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
     python3 collect_training_data.py \
-      --videos-dir ./videos/kitchen/ \
-      --info-path ./canonical.json \
-      --output output/mis_escenarios.json
+        --videos-dir ./videos/kitchen/ \
+        --info-path ./canonical.json \
+        --output output/mis_escenarios.json
 
   # Solo procesar videos - JSON
   python3 collect_training_data.py \
@@ -222,7 +222,7 @@ def main():
 
         synthetic = []
         if not args.no_synthetic:
-            from training_data import get_all_training_data
+            from scripts.training_data import get_all_training_data
             synthetic = get_all_training_data()
 
         print(f"\nDatos sintéticos : {len(synthetic)}")
@@ -255,7 +255,6 @@ def main():
             semantic_graph.build_full_action_graph(
                 new_concepts, robot_capabilities.actions)
 
-        # Entrenar
         gnn_optimizer = GNNCostOptimizer(knowledge_base)
         trainer       = GNNTrainer(gnn_optimizer, semantic_graph, knowledge_base)
 
