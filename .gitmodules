@@ -1,0 +1,3 @@
+[submodule "external/epic-kitchens-download-scripts"]
+	path = external/epic-kitchens-download-scripts
+	url = https://github.com/epic-kitchens/epic-kitchens-download-scripts.git
