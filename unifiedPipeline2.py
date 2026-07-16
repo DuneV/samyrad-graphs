@@ -11,6 +11,7 @@ que training_data.py, listo para pasarse a GNNTrainer.train_supervised().
 """
 
 import json
+import re
 import numpy as np
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -21,14 +22,41 @@ from tqdm import tqdm
 
 from videoAnalyzer import VideoAnalyzer
 from storyTelling import StoryTelling, Graph
+from epic_ground_truth import EpicGroundTruth
+
+# PXX_YY o PXX_1YY (extensión de EPIC-KITCHENS-100)
+EPIC_VIDEO_ID_RE = re.compile(r"(P\d{2}_\d{2,3})")
 
 
 class UnifiedPipeline:
 
-    def __init__(self, va: VideoAnalyzer, st: StoryTelling):
+    def __init__(self, va: VideoAnalyzer, st: StoryTelling,
+                 ground_truth: Optional[EpicGroundTruth] = None):
         self.va = va
         self.st = st
         self.graph: Optional[Graph] = None
+
+        # Ground truth de EPIC-KITCHENS (opcional). Si se pasa aquí, se
+        # propaga a StoryTelling y se detecta el video_id automáticamente
+        # a partir del nombre del archivo de video (ej. ".../P01_11.MP4").
+        if ground_truth is not None:
+            self.st.gt = ground_truth
+            self.st.video_id = self._detect_epic_video_id(self.va.path)
+            if self.st.video_id and not ground_truth.has_video(self.st.video_id):
+                print(f"⚠ video_id '{self.st.video_id}' detectado en el nombre "
+                      f"del archivo pero no está en las anotaciones cargadas "
+                      f"(¿cargaste train.csv y validation.csv?). Se usará CLIP.")
+                self.st.video_id = None
+            elif self.st.video_id:
+                print(f"✓ Ground truth activo para video_id='{self.st.video_id}'")
+
+    @staticmethod
+    def _detect_epic_video_id(video_path: str) -> Optional[str]:
+        """Extrae 'P01_11' de un path tipo '.../videos/P01_11.MP4'.
+        Devuelve None si el video no parece ser de EPIC-KITCHENS
+        (ej. tus propios videos grabados con el robot)."""
+        match = EPIC_VIDEO_ID_RE.search(Path(video_path).stem)
+        return match.group(1) if match else None
 
     def run(self) -> None:
         self.va.get_video_info()
@@ -50,7 +78,7 @@ class UnifiedPipeline:
                 # 1. YOLO + Depth
                 yolo_result, depth_np = self.va.process_frame(frame, framecounter)
 
-                # 2. MediaPipe + CLIP  (usa yolo_result de arriba)
+                # 2. MediaPipe + (ground truth si existe, si no CLIP)
                 frame_data = self.st.process_frame_hands(frame, yolo_result, framecounter)
                 if frame_data is not None:
                     self.st.scene.append(frame_data)
@@ -71,80 +99,23 @@ class UnifiedPipeline:
         print(f"Frames con manos   : {len(self.st.scene)}")
         print(f"Objetos confirmados: {list(self.va.confirmed.keys())}")
         print(f"Eventos semánticos : {len(self.st.semantic_line)}")
+        self._print_gt_vs_clip_stats()
         self.st.print_semantic_line()
 
-    # def generate_scenario(
-    #     self,
-    #     semantic_graph: nx.MultiDiGraph,
-    #     goal: Optional[str] = None,
-    # ) -> Dict:
-    #     """
-    #     Parámetro:
-    #       semantic_graph : el nx.MultiDiGraph de SemanticActionGraph.graph
-    #                        (necesario para iterar todas las aristas posibles
-    #                         y asignarles un peso, igual que edge_labels)
-    #       goal           : string del objetivo. Si es None, se infiere de
-    #                        la línea semántica.
+    def _print_gt_vs_clip_stats(self) -> None:
+        """Cuántos eventos de semantic_line vinieron de ground truth (conf=1.0
+        exacto y self.st.gt activo) vs de CLIP. Útil para saber cuánto te
+        estás apoyando en anotaciones reales vs en inferencia visual."""
+        if self.st.gt is None or self.st.video_id is None:
+            print("Ground truth : no usado (video sin anotaciones EPIC-KITCHENS)")
+            return
 
-    #     Devuelve un dict listo para GNNTrainer.train_supervised().
-    #     """
-
-    #     detected_objects = list(self.va.confirmed.keys())
-    #     object_positions: Dict[str, Tuple] = {
-    #         label: (
-    #             float(obj.pos.get("cx", 0)),
-    #             float(obj.pos.get("cy", 0)),
-    #             float(obj.pos.get("z0", 0)),
-    #         )
-    #         for label, obj in self.va.confirmed.items()
-    #         if obj.pos
-    #     }
-
-    #     required_actions = list({
-    #         e["action"] for e in self.st.semantic_line
-    #     })
-    #     target_objects = list({
-    #         e["object"] for e in self.st.semantic_line
-    #     })
-
-    #     if goal is None:
-    #         goal = self._infer_goal(target_objects, required_actions)
-
-    #     # Para cada arista del grafo semántico completo (SemanticActionGraph),
-    #     # calcula el peso basándose en lo que se observó en el video.
-    #     # Misma lógica que _compute_heuristic_factor del trainer,
-    #     # pero usando distancias 3D reales en lugar de posiciones sintéticas.
-    #     edge_labels: Dict[Tuple, float] = {}
-    #     for u, v, _, data in semantic_graph.edges(keys=True, data=True):
-    #         action = data.get("action", "unknown")
-    #         weight = self._compute_edge_weight(
-    #             source          = u,
-    #             target          = v,
-    #             action          = action,
-    #             target_objects  = target_objects,
-    #             required_actions= required_actions,
-    #             detected_objects= detected_objects,
-    #             object_positions= object_positions,
-    #         )
-    #         edge_labels[(u, action, v)] = weight
-
-    #     scenario = {
-    #         "goal":             goal,
-    #         "target_objects":   target_objects,
-    #         "required_actions": required_actions,
-    #         "detected_objects": detected_objects,
-    #         "object_positions": object_positions,
-    #         "edge_labels":      edge_labels,
-    #     }
-
-    #     print(f"\nEscenario generado")
-    #     print(f"  goal             : {goal}")
-    #     print(f"  target_objects   : {target_objects}")
-    #     print(f"  required_actions : {required_actions}")
-    #     print(f"  detected_objects : {detected_objects}")
-    #     print(f"  edge_labels      : {len(edge_labels)} aristas")
-
-    #     return scenario
+        total = len(self.st.semantic_line)
+        from_gt = sum(1 for e in self.st.semantic_line if e["action_conf"] == 1.0)
+        from_clip = total - from_gt
+        pct = (from_gt / total * 100) if total else 0.0
+        print(f"Ground truth vs CLIP: {from_gt}/{total} ({pct:.1f}%) desde EPIC-KITCHENS, "
+              f"{from_clip} inferidos con CLIP")
 
     def generate_scenario(self, goal: Optional[str] = None) -> Dict:
 
@@ -196,6 +167,7 @@ class UnifiedPipeline:
             "detected_objects": detected_objects,
             "object_positions": object_positions,
             "edge_labels":      edge_labels,
+            "source":           "epic_ground_truth" if (self.st.gt and self.st.video_id) else "clip",
         }
 
     def _weight_from_distance(self, src, tgt, positions, base=0.20) -> float:
@@ -205,20 +177,9 @@ class UnifiedPipeline:
             dist = float(np.linalg.norm(p1 - p2))
             return round(min(base + dist / 500.0, 1.90), 2)
         return round(base + 0.30, 2)
-    
-    
+
     def _infer_goal(self, target_objects: List[str],
                     required_actions: List[str]) -> str:
-        """
-        Construye una descripción del goal a partir de la línea semántica.
-        Ejemplos:
-          grasp(cup) + move_to(table)  - 'Move the cup to the table'
-          open(cabinet)                - 'Open the cabinet'
-          grasp(knife) + cut(avocado)  - 'Cut the avocado with the knife'
-        Si hay LLaVA disponible (self.st.vlm.backend == 'llava'), usa una
-        llamada al VLM sobre el primer crop con interacción.
-        """
-
         if self.st.vlm.backend == "llava" and self.st.scene:
             for frame_data in self.st.scene:
                 for hand in frame_data.get("hands", []):
@@ -259,14 +220,6 @@ class UnifiedPipeline:
         detected_objects: List[str],
         object_positions: Dict[str, Tuple],
     ) -> float:
-        """
-
-        Escala de pesos:
-          0.10 – 0.30 : acción correcta, objetos cerca y detectados
-          0.30 – 0.80 : acción correcta pero con penalizaciones (distancia, no detectado)
-          0.80 – 1.20 : acción plausible pero no requerida
-          1.20 – 1.95 : acción incorrecta o inviable
-        """
         src_concept = source.split("_")[0] if "_" in source else source
         tgt_concept = target.split("_")[0] if "_" in target else target
 
@@ -291,7 +244,6 @@ class UnifiedPipeline:
             w = 0.20
         elif observed:
             w = 0.28
-
         elif action in required_set and tgt_concept in target_set and tgt_concept in detected_set and near:
             w = 0.25
         elif action in required_set and tgt_concept in target_set and tgt_concept in detected_set:
@@ -304,7 +256,6 @@ class UnifiedPipeline:
             w = 0.65
         elif action in required_set:
             w = 0.80
-
         elif tgt_concept in target_set and tgt_concept in detected_set and near:
             w = 0.75
         elif tgt_concept in target_set and tgt_concept in detected_set:
@@ -319,35 +270,6 @@ class UnifiedPipeline:
             w = 1.85
 
         return round(w, 2)
-
-    # def build_perceptual_graph(self):
-    #     """
-    #     Convierte VideoAnalyzer.confirmed → PerceptualGraph (InstanceNode).
-    #     Necesario para pasarle al GNN en inferencia:
-    #       gnn_optimizer.optimize_costs(semantic_graph, perceptual_graph, goal, ...)
-    #     """
-    #     # Importa la clase real que el GNN usa (definida en el notebook)
-    #     from perceptual_knowledge import PerceptualGraph as PG
-
-    #     pg = PG()
-    #     for label, obj in self.va.confirmed.items():
-    #         if not obj.pos:
-    #             continue
-    #         pos = (obj.pos["cx"], obj.pos["cy"], obj.pos["z0"])
-    #         conf = obj.pos.get("confidence", 0.9)
-    #         bbox_w, bbox_h = 50, 50   # aproximación si no tienes bbox exacto
-    #         pg.add_instance(
-    #             concept    = label,
-    #             position   = pos,
-    #             confidence = conf,
-    #             bbox       = (pos[0] - bbox_w/2, pos[1] - bbox_h/2, bbox_w, bbox_h),
-    #         )
-    #     pg.compute_spatial_relations()
-    #     return pg
-
-    # ──────────────────────────────────────────────────────────────────
-    # Guardado
-    # ──────────────────────────────────────────────────────────────────
 
     def save(self, scenario: Optional[Dict] = None) -> None:
         run = self.va.run_name
@@ -366,7 +288,6 @@ class UnifiedPipeline:
             json.dump(confirmed_data, f, indent=2)
 
         if scenario is not None:
-            # Serializa las claves tuple de edge_labels a strings
             serializable = dict(scenario)
             serializable["edge_labels"] = {
                 str(k): v for k, v in scenario["edge_labels"].items()
@@ -386,11 +307,11 @@ if __name__ == "__main__":
 
     base = Path(__file__).resolve().parent
     ws   = base.parent.parent
-    RUN  = "prueba_unificada"
+    RUN  = "P01_11"   # usa el video_id real si es un video de EPIC-KITCHENS
 
     va = VideoAnalyzer(
-        video       = "test.mp4",
-        path        = str(base / "test.mp4"),
+        video       = f"{RUN}.mp4",
+        path        = str(base / f"{RUN}.mp4"),
         output_path = str(base / f"output_{RUN}.mp4"),
         model_path  = str(ws  / "yoloe-11l-seg-pf.pt"),
         confidence  = 0.5,
@@ -401,8 +322,8 @@ if __name__ == "__main__":
     )
 
     st = StoryTelling(
-        video        = "test.mp4",
-        path         = str(base / "test.mp4"),
+        video        = f"{RUN}.mp4",
+        path         = str(base / f"{RUN}.mp4"),
         output_path  = str(base / f"output_{RUN}.mp4"),
         model_path   = str(ws  / "yoloe-11l-seg-pf.pt"),
         confidence   = 0.5,
@@ -410,35 +331,14 @@ if __name__ == "__main__":
         run_name     = RUN,
         vlm_backend  = "clip",
     )
-    st.gt = EpicGroundTruth(["EPIC_100_train.csv", "EPIC_100_validation.csv"])
 
-    pipeline = UnifiedPipeline(va, st)
+    # Carga el ground truth UNA sola vez y pásalo al pipeline; él se encarga
+    # de detectar el video_id (P01_11) desde el nombre del archivo y de
+    # conectarlo con StoryTelling.
+    gt = EpicGroundTruth(["EPIC_100_train.csv", "EPIC_100_validation.csv"])
+
+    pipeline = UnifiedPipeline(va, st, ground_truth=gt)
     pipeline.run()
 
     scenario = pipeline.generate_scenario(goal=None)
-
-    # El SemanticActionGraph se inicializa igual que en el notebook
-    # from robot_physical_capacities import RobotCapabilities
-    # from knowledge_base import KnowledgeBase
-    # from semantic_graph import SemanticActionGraph
-
-    # robot_capabilities = RobotCapabilities()
-    # knowledge_base     = KnowledgeBase()
-    # sem_graph          = SemanticActionGraph(robot_capabilities, knowledge_base)
-    # sem_graph.build_full_action_graph(
-    #     knowledge_base.concepts.keys(),
-    #     robot_capabilities.actions,
-    # )
-
-    # # Genera el escenario automáticamente desde el video
-    # # goal=None → se infiere de la línea semántica de CLIP
-    # scenario = pipeline.generate_scenario(
-    #     semantic_graph = sem_graph.graph,
-    #     goal           = None,
-    # )
-
     pipeline.save(scenario)
-
-    # Para acumular varios videos y entrenar:
-    # all_scenarios = [scenario1, scenario2, ...]
-    # trainer.train_supervised(labeled_examples=all_scenarios, epochs=300)

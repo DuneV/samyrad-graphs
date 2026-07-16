@@ -8,7 +8,8 @@ from typing import List, Tuple, Dict, Optional
 import torch
 import numpy as np
 from PIL import Image
-
+from robotAction import *
+from epic_ground_truth import *
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.vision import HandLandmarker, HandLandmarkerOptions, RunningMode
@@ -23,7 +24,6 @@ HAND_KEYPOINT_NAMES = [
     "PINKY_MCP", "PINKY_PIP", "PINKY_DIP", "PINKY_TIP",
 ]
 
-# Candidatos para clasificación zero-shot con CLIP
 CANDIDATE_ACTIONS = [
     "a hand grasping an object",
     "a hand moving an object to another location",
@@ -177,6 +177,9 @@ class StoryTelling:
     def __init__(self, video, path, output_path, model_path, confidence,
                  N=5, run_name="prueba1", device="cuda",
                  vlm_backend: str = "clip"):
+        
+        self.gt: Optional[EpicGroundTruth] = None
+        self.video_id : Optional[str] = None
         self.video = video
         self.path = path
         self.output = output_path
@@ -301,7 +304,16 @@ class StoryTelling:
                     # ── Clasificación de acción con VLM ────────────────
                     crop = VLMEncoder.make_crop(frame, (wx, wy),
                                                 (xmin, ymin, xmax, ymax))
-                    action, action_conf = self.vlm.classify_action(crop)
+                    gt_action = None
+                    if self.gt is not None and self.video_id is not None:
+                        seg = self.gt.segment_at_frame(self.video_id, framecounter)
+                        if seg is not None:
+                            gt_action = EPIC_TO_ROBOT.get(seg.verb)  
+
+                    if gt_action is not None:
+                        action, action_conf = gt_action, 1.0  
+                    else:
+                        action, action_conf = self.vlm.classify_action(crop)
 
                     interactions.append({
                         "object":         obj_label,
@@ -396,6 +408,7 @@ class StoryTelling:
                 graph.relations.append((a, "co_detected", b))
 
         return graph
+        
 
     def pipeline(self):
         """Pipeline standalone de StoryTelling (sin VideoAnalyzer)."""

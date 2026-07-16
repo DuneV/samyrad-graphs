@@ -74,7 +74,7 @@ def scenario_from_video(video_path: str, run_name: str,
     """
     from videoAnalyzer import VideoAnalyzer
     from storyTelling import StoryTelling
-    from unifiedPipeline import UnifiedPipeline
+    from unifiedPipeline2 import UnifiedPipeline
 
     va = VideoAnalyzer(
         video       = video_path,
