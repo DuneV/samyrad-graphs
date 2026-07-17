@@ -83,7 +83,7 @@ def scenario_from_video(video_path: str, run_name: str,
         model_path  = model_path,
         confidence  = confidence,
         info_path   = info_path,
-        alpha       = 0.5,
+        alpha       = 0.5,  
         N           = N,
         run_name    = run_name,
     )

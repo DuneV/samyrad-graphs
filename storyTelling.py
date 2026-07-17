@@ -177,9 +177,9 @@ class StoryTelling:
     def __init__(self, video, path, output_path, model_path, confidence,
                  N=5, run_name="prueba1", device="cuda",
                  vlm_backend: str = "clip"):
-        
+
         self.gt: Optional[EpicGroundTruth] = None
-        self.video_id : Optional[str] = None
+        self.video_id: Optional[str] = None
         self.video = video
         self.path = path
         self.output = output_path
@@ -195,7 +195,7 @@ class StoryTelling:
         # Estado de confirmación de manos entre frames
         self._frame_counter: Dict[str, int] = {}
 
-        # VLMEncoder para clasificar acciones
+        # VLMEncoder para clasificar acciones (SIEMPRE se usa para predecir)
         self.vlm = VLMEncoder(backend=vlm_backend, device=device)
 
         options = HandLandmarkerOptions(
@@ -226,7 +226,11 @@ class StoryTelling:
         """
         Corre MediaPipe sobre el frame.
         Recibe yolo_result ya calculado (de VideoAnalyzer o del pipeline propio).
-        Si hay interacción mano-objeto, clasifica la acción con VLMEncoder (CLIP/LLaVA).
+        Si hay interacción mano-objeto, SIEMPRE clasifica la acción con
+        VLMEncoder (CLIP/LLaVA). Si hay ground truth de EPIC-KITCHENS
+        disponible para ese frame, se guarda aparte (gt_action) solo para
+        comparar después con evaluate_detector_vs_gt() — nunca reemplaza
+        la predicción del detector.
         Devuelve dict de frame o None si no hay manos confirmadas.
         """
         timestamp_ms = int(framecounter * 1000 / self.fps)
@@ -301,19 +305,17 @@ class StoryTelling:
                     for px, py in hand_px
                 )
                 if touching:
-                    # ── Clasificación de acción con VLM ────────────────
+                    # ── Clasificación de acción con VLM (SIEMPRE) ──────
                     crop = VLMEncoder.make_crop(frame, (wx, wy),
                                                 (xmin, ymin, xmax, ymax))
+                    action, action_conf = self.vlm.classify_action(crop)
+
+                    # ── Ground truth SOLO para comparar, no reemplaza ──
                     gt_action = None
                     if self.gt is not None and self.video_id is not None:
                         seg = self.gt.segment_at_frame(self.video_id, framecounter)
                         if seg is not None:
-                            gt_action = EPIC_TO_ROBOT.get(seg.verb)  
-
-                    if gt_action is not None:
-                        action, action_conf = gt_action, 1.0  
-                    else:
-                        action, action_conf = self.vlm.classify_action(crop)
+                            gt_action = EPIC_TO_ROBOT.get(seg.verb)
 
                     interactions.append({
                         "object":         obj_label,
@@ -323,11 +325,13 @@ class StoryTelling:
                                            if masks_xy is not None else []),
                         "action":         action,
                         "action_conf":    round(action_conf, 4),
+                        "gt_action":      gt_action,
                     })
 
                     # Agrega a la línea semántica (deduplica eventos iguales)
                     self._add_semantic_event(
-                        framecounter, timestamp_ms, label, action, obj_label, action_conf
+                        framecounter, timestamp_ms, label, action, obj_label,
+                        action_conf, gt_action
                     )
 
             if interactions:
@@ -349,8 +353,14 @@ class StoryTelling:
         return current_frame_data
 
     def _add_semantic_event(self, frame_index, timestamp_ms,
-                             hand, action, obj_label, action_conf) -> None:
-        """Agrega un evento a self.semantic_line evitando repetidos consecutivos."""
+                             hand, action, obj_label, action_conf,
+                             gt_action: Optional[str] = None) -> None:
+        """Agrega un evento a self.semantic_line evitando repetidos consecutivos.
+        action     : predicción del detector (CLIP/LLaVA) — la que usa el resto
+                     del pipeline (edge_labels, entrenamiento del GNN).
+        gt_action  : ground truth de EPIC-KITCHENS si está disponible — SOLO
+                     para evaluate_detector_vs_gt(), nunca sustituye a action.
+        """
         if self.semantic_line:
             last = self.semantic_line[-1]
             if (last["hand"] == hand and last["action"] == action
@@ -363,15 +373,70 @@ class StoryTelling:
             "action":       action,
             "object":       obj_label,
             "action_conf":  round(action_conf, 4),
+            "gt_action":    gt_action,
         })
 
     def print_semantic_line(self) -> None:
         print("\n── Línea Semántica ───────────────────────────────────────")
         for e in self.semantic_line:
             t = e["timestamp_ms"] / 1000
+            marca = f"  (gt={e['gt_action']})" if e.get("gt_action") else ""
             print(f"  [{t:6.2f}s] {e['hand']:12s} "
                   f"--({e['action']:12s})--> {e['object']:15s}  "
-                  f"conf={e['action_conf']:.2f}")
+                  f"conf={e['action_conf']:.2f}{marca}")
+        print("──────────────────────────────────────────────────────────\n")
+
+    def evaluate_detector_vs_gt(self) -> Optional[Dict]:
+        """
+        Compara las predicciones del detector (self.vlm) contra el ground
+        truth de EPIC-KITCHENS. Solo evalúa eventos donde hay gt_action
+        disponible (es decir, videos de EPIC-KITCHENS con self.gt/
+        self.video_id seteados). Devuelve None si no hay nada que comparar.
+        """
+        pairs = [(e["action"], e["gt_action"]) for e in self.semantic_line
+                 if e.get("gt_action") is not None]
+        if not pairs:
+            return None
+
+        from collections import defaultdict
+        total = len(pairs)
+        correct = sum(1 for pred, gt in pairs if pred == gt)
+
+        confusion = defaultdict(lambda: defaultdict(int))
+        per_class_total = defaultdict(int)
+        per_class_correct = defaultdict(int)
+        for pred, gt in pairs:
+            confusion[gt][pred] += 1
+            per_class_total[gt] += 1
+            if pred == gt:
+                per_class_correct[gt] += 1
+
+        return {
+            "total": total,
+            "correct": correct,
+            "accuracy": round(correct / total, 3),
+            "per_class_accuracy": {
+                c: round(per_class_correct[c] / per_class_total[c], 3)
+                for c in per_class_total
+            },
+            "confusion_matrix": {k: dict(v) for k, v in confusion.items()},
+        }
+
+    def print_evaluation(self) -> None:
+        result = self.evaluate_detector_vs_gt()
+        if result is None:
+            print("Sin ground truth para evaluar (video no es de EPIC-KITCHENS "
+                  "o self.gt/self.video_id no están seteados).")
+            return
+        print("\n── Evaluación detector vs. ground truth ─────────────────")
+        print(f"  Accuracy global: {result['accuracy']*100:.1f}%  "
+              f"({result['correct']}/{result['total']})")
+        print("  Accuracy por acción (ground truth):")
+        for cls, acc in sorted(result["per_class_accuracy"].items()):
+            print(f"    {cls:12s}: {acc*100:.1f}%")
+        print("  Matriz de confusión (fila=ground truth, columna=predicción):")
+        for gt_cls, preds in sorted(result["confusion_matrix"].items()):
+            print(f"    {gt_cls:12s}: {dict(preds)}")
         print("──────────────────────────────────────────────────────────\n")
 
     def create_story(self, data: Dict) -> Graph:
@@ -408,7 +473,6 @@ class StoryTelling:
                 graph.relations.append((a, "co_detected", b))
 
         return graph
-        
 
     def pipeline(self):
         """Pipeline standalone de StoryTelling (sin VideoAnalyzer)."""
@@ -437,6 +501,7 @@ class StoryTelling:
         self.out.release()
         cv2.destroyAllWindows()
         self.print_semantic_line()
+        self.print_evaluation()
 
     def save_scene(self):
         Path(f"output/{self.run_name}").mkdir(parents=True, exist_ok=True)
