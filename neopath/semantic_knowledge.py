@@ -124,6 +124,65 @@ class KnowledgeBase:
         
         print(f"✓ Learned new concept: {concept_type} (affordances: {concept.affordances})")
         return concept
+
+    def learn_concept_from_observations(self, concept_type: str,
+                                        observed_actions: Dict[str, int],
+                                        robot_capabilities: RobotCapabilities
+                                        ) -> ConceptKnowledge:
+        """
+        Aprende un concepto nuevo a partir de acciones REALMENTE
+        OBSERVADAS con ese objeto (ej. contadas desde semantic_line del
+        clasificador de acciones a través de muchos escenarios), en vez
+        del placeholder genérico {"inspectable"} que usa learn_concept()
+        cuando no hay groq_client configurado.
+
+        observed_actions: {nombre_accion: veces_observada}, ej.
+            {"cut": 42, "grasp": 15, "move_to": 8}
+        robot_capabilities: se usa para traducir cada acción observada a
+            sus affordances reales (required_affordances/tool_affordances/
+            target_affordances de RobotAction), no un vocabulario inventado.
+
+        El resultado es trazable: learned_from queda registrado como
+        "classifier_observations", y contextual_info incluye las
+        acciones observadas y sus conteos.
+        """
+        actions_by_name = {a.name: a for a in robot_capabilities.actions}
+
+        affordances: Set[str] = set()
+        is_tool = False
+        for action_name, count in observed_actions.items():
+            action = actions_by_name.get(action_name)
+            if action is None:
+                continue   # acción observada sin definición en robot_actions.json
+            affordances.update(action.required_affordances)
+            affordances.update(action.target_affordances)
+            if action.tool_affordances:
+                is_tool = True
+
+        if not affordances:
+            affordances = {"inspectable"}   # sin ninguna acción reconocida, mínimo seguro
+
+        total_obs = sum(observed_actions.values())
+        top_actions = sorted(observed_actions.items(), key=lambda x: -x[1])[:3]
+        top_actions_str = ", ".join(f"{a}({n})" for a, n in top_actions)
+
+        concept = ConceptKnowledge(
+            concept_type=concept_type,
+            tool=is_tool,
+            affordances=affordances,
+            physical_properties={},
+            contextual_info=(f"Learned from {total_obs} classifier observations "
+                            f"across real video. Top actions: {top_actions_str}"),
+            safety_level="caution",
+            learned_from="classifier_observations",
+        )
+
+        self.concepts[concept_type] = concept
+        self.save()
+
+        print(f"✓ Learned '{concept_type}' from {total_obs} real observations "
+              f"(affordances: {affordances})")
+        return concept
     
     def suggest_affordances(self, capabilities: RobotCapabilities) -> Set[str]:
         """Sugiere affordances para un concepto dado"""

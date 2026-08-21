@@ -1,0 +1,5 @@
+video_id: P37_101
+objeto: spatula
+real: grasp
+predicho: actuate
+confianza: 0.399

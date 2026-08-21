@@ -1,0 +1,162 @@
+[
+  {
+    "video_id": "P37_101",
+    "window_idx": 1,
+    "objeto": "fridge",
+    "real": "close",
+    "predicho": "actuate",
+    "confianza": 0.820620596408844
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 8,
+    "objeto": "cupboard",
+    "real": "open",
+    "predicho": "actuate",
+    "confianza": 0.7710139155387878
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 10,
+    "objeto": "cupboard",
+    "real": "close",
+    "predicho": "move_to",
+    "confianza": 0.39115241169929504
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 14,
+    "objeto": "towel:cleaning",
+    "real": "move_to",
+    "predicho": "press",
+    "confianza": 0.644450843334198
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 24,
+    "objeto": "thigh:chicken",
+    "real": "grasp",
+    "predicho": "actuate",
+    "confianza": 0.5194985270500183
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 31,
+    "objeto": "thigh:chicken",
+    "real": "grasp",
+    "predicho": "move_to",
+    "confianza": 0.7455374002456665
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 32,
+    "objeto": "thigh:chicken",
+    "real": "grasp",
+    "predicho": "press",
+    "confianza": 0.7774259448051453
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 52,
+    "objeto": "hob:induction",
+    "real": "press",
+    "predicho": "actuate",
+    "confianza": 0.7936195731163025
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 55,
+    "objeto": "garlic",
+    "real": "grasp",
+    "predicho": "actuate",
+    "confianza": 0.6478016972541809
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 98,
+    "objeto": "cucumber",
+    "real": "cut",
+    "predicho": "move_to",
+    "confianza": 0.5154556035995483
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 123,
+    "objeto": "garlic",
+    "real": "grasp",
+    "predicho": "move_to",
+    "confianza": 0.45240727066993713
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 124,
+    "objeto": "skin:garlic",
+    "real": "cut",
+    "predicho": "move_to",
+    "confianza": 0.5146273970603943
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 129,
+    "objeto": "skin:garlic",
+    "real": "cut",
+    "predicho": "move_to",
+    "confianza": 0.5658191442489624
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 135,
+    "objeto": "skin:garlic",
+    "real": "cut",
+    "predicho": "move_to",
+    "confianza": 0.7923856973648071
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 164,
+    "objeto": "thigh:chicken",
+    "real": "grasp",
+    "predicho": "press",
+    "confianza": 0.5983386039733887
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 166,
+    "objeto": "thigh:chicken",
+    "real": "grasp",
+    "predicho": "press",
+    "confianza": 0.37269195914268494
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 176,
+    "objeto": "lid",
+    "real": "close",
+    "predicho": "move_to",
+    "confianza": 0.41236457228660583
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 185,
+    "objeto": "garlic:smashed",
+    "real": "move_to",
+    "predicho": "press",
+    "confianza": 0.32001495361328125
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 194,
+    "objeto": "bottle:cooking:wine",
+    "real": "grasp",
+    "predicho": "actuate",
+    "confianza": 0.3855133354663849
+  },
+  {
+    "video_id": "P37_101",
+    "window_idx": 233,
+    "objeto": "hand",
+    "real": "rotate",
+    "predicho": "actuate",
+    "confianza": 0.6239475011825562
+  }
+]

@@ -31,10 +31,26 @@ EPIC_VIDEO_ID_RE = re.compile(r"(P\d{2}_\d{2,3})")
 class UnifiedPipeline:
 
     def __init__(self, va: VideoAnalyzer, st: StoryTelling,
-                 ground_truth: Optional[EpicGroundTruth] = None):
+                 ground_truth: Optional[EpicGroundTruth] = None,
+                 checkpoint_every: Optional[int] = 1000,
+                 checkpoint_dir: Optional[str] = None,
+                 keep_all_checkpoints: bool = False,
+                 memory_log_every: Optional[int] = 200):
+        """
+        memory_log_every : cada cuántos frames imprimir RAM del proceso y
+            VRAM de la GPU (si hay). None desactiva. Útil para diagnosticar
+            fugas de memoria: si estos números crecen sin parar frame tras
+            frame, hay algo acumulándose que no se está liberando.
+        """
         self.va = va
         self.st = st
         self.graph: Optional[Graph] = None
+
+        self.checkpoint_every = checkpoint_every
+        self.checkpoint_dir = Path(checkpoint_dir or f"checkpoints/{va.run_name}")
+        self.keep_all_checkpoints = keep_all_checkpoints
+        self.memory_log_every = memory_log_every
+        self._memory_log_path = self.checkpoint_dir / "memory_log.csv"
 
         # Ground truth de EPIC-KITCHENS (opcional). Si se pasa aquí, se
         # propaga a StoryTelling y se detecta el video_id automáticamente
@@ -91,6 +107,14 @@ class UnifiedPipeline:
                 pbar.update(1)
                 framecounter += 1
 
+                if (self.checkpoint_every
+                        and framecounter % self.checkpoint_every == 0):
+                    self._save_checkpoint(framecounter)
+
+                if (self.memory_log_every
+                        and framecounter % self.memory_log_every == 0):
+                    self._log_memory(framecounter)
+
         self.va.cap.release()
         self.va.out.release()
         cv2.destroyAllWindows()
@@ -101,6 +125,106 @@ class UnifiedPipeline:
         print(f"Eventos semánticos : {len(self.st.semantic_line)}")
         self._print_gt_vs_clip_stats()
         self.st.print_semantic_line()
+
+    def _log_memory(self, framecounter: int) -> None:
+        """
+        Registra RAM del proceso (RSS), VRAM (si hay CUDA), y el tamaño
+        de las estructuras que crecen frame a frame (scene, semantic_line,
+        vectors, confirmed). Se apila en checkpoint_dir/memory_log.csv
+        para poder graficar la tendencia después.
+        Si algo crece linealmente con framecounter sin estabilizarse,
+        ahí está la fuga.
+        """
+        try:
+            import psutil
+            proc = psutil.Process()
+            rss_mb = proc.memory_info().rss / (1024 ** 2)
+        except ImportError:
+            rss_mb = -1.0  # psutil no instalado
+
+        vram_alloc_mb = vram_reserved_mb = -1.0
+        try:
+            import torch
+            if torch.cuda.is_available():
+                vram_alloc_mb = torch.cuda.memory_allocated() / (1024 ** 2)
+                vram_reserved_mb = torch.cuda.memory_reserved() / (1024 ** 2)
+        except ImportError:
+            pass
+
+        n_scene = len(self.st.scene)
+        n_semantic = len(self.st.semantic_line)
+        n_vectors = len(self.va.vectors)
+        n_confirmed = len(self.va.confirmed)
+
+        self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        is_new = not self._memory_log_path.exists()
+        with open(self._memory_log_path, "a") as f:
+            if is_new:
+                f.write("frame,rss_mb,vram_alloc_mb,vram_reserved_mb,"
+                        "len_scene,len_semantic_line,len_vectors,len_confirmed\n")
+            f.write(f"{framecounter},{rss_mb:.1f},{vram_alloc_mb:.1f},"
+                    f"{vram_reserved_mb:.1f},{n_scene},{n_semantic},"
+                    f"{n_vectors},{n_confirmed}\n")
+
+        print(f"  [mem] frame {framecounter}: RSS={rss_mb:.0f}MB "
+              f"VRAM_alloc={vram_alloc_mb:.0f}MB VRAM_reserved={vram_reserved_mb:.0f}MB "
+              f"| scene={n_scene} semantic_line={n_semantic} "
+              f"vectors={n_vectors} confirmed={n_confirmed}")
+
+    def _save_checkpoint(self, framecounter: int) -> None:
+        """
+        Guarda el progreso actual (objetos confirmados + línea semántica +
+        escenario parcial) sin interrumpir el procesamiento del video.
+        No incluye los vectores de profundidad (self.va.vectors) porque
+        pesan mucho y crecen con cada frame — si los necesitas para debug,
+        agrégalos aparte.
+        """
+        try:
+            self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            partial_scenario = self.generate_scenario(goal=None)
+            partial_scenario["edge_labels"] = {
+                str(k): v for k, v in partial_scenario["edge_labels"].items()
+            }
+
+            data = {
+                "frame_actual":      framecounter,
+                "total_frames":      getattr(self.va, "total_frames", None),
+                "objetos_confirmados": list(self.va.confirmed.keys()),
+                "eventos_semanticos":  len(self.st.semantic_line),
+                "scenario_parcial":    partial_scenario,
+            }
+
+            if self.keep_all_checkpoints:
+                path = self.checkpoint_dir / f"checkpoint_frame{framecounter:07d}.json"
+            else:
+                path = self.checkpoint_dir / "checkpoint_latest.json"
+
+            with open(path, "w") as f:
+                json.dump(data, f, indent=2)
+
+            print(f"  [checkpoint] frame {framecounter}: "
+                  f"{len(self.va.confirmed)} objetos, "
+                  f"{len(self.st.semantic_line)} eventos -> {path}")
+        except Exception as e:
+            # Un checkpoint fallido NUNCA debe tumbar el procesamiento del video
+            print(f"  [checkpoint] ⚠ no se pudo guardar en frame {framecounter}: {e}")
+
+    @staticmethod
+    def load_checkpoint(path: str) -> Dict:
+        """Carga un checkpoint guardado (útil para inspeccionar progreso
+        de un video que sigue corriendo, o recuperar el último estado
+        conocido tras un crash)."""
+        with open(path) as f:
+            data = json.load(f)
+        # Restaura las claves tuple de edge_labels, igual que load_scenarios_from_json
+        edge_labels = data["scenario_parcial"].get("edge_labels", {})
+        fixed = {}
+        for k, v in edge_labels.items():
+            inner = k.strip("()").replace("'", "").split(", ")
+            fixed[tuple(inner)] = v
+        data["scenario_parcial"]["edge_labels"] = fixed
+        return data
 
     def _print_gt_vs_clip_stats(self) -> None:
         """Cuántos eventos de semantic_line vinieron de ground truth (conf=1.0

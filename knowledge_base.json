@@ -1,0 +1,718 @@
+{
+  "concepts": {
+    "knife": {
+      "concept_type": "knife",
+      "tool": true,
+      "affordances": [
+        "movable",
+        "pickable",
+        "cutting",
+        "graspable",
+        "inspectable"
+      ],
+      "physical_properties": {
+        "weight": "light",
+        "fragility": "sturdy"
+      },
+      "contextual_info": "Sharp cutting tool, dangerous to living beings",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "predefined",
+      "timestamp": "2026-08-20T07:15:03.601418",
+      "visual_properties": {}
+    },
+    "avocado": {
+      "concept_type": "avocado",
+      "tool": false,
+      "affordances": [
+        "scoopable",
+        "edible",
+        "cuttable"
+      ],
+      "physical_properties": {
+        "weight": "varies",
+        "fragility": "delicate"
+      },
+      "contextual_info": "A vegetable that is edible and used for salads; handle with care",
+      "safety_level": "safe",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "predefined",
+      "timestamp": "2026-08-20T07:15:03.601426",
+      "visual_properties": {}
+    },
+    "tap": {
+      "concept_type": "tap",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 120 classifier observations across real video. Top actions: press(106), move_to(9), actuate(4)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.601570",
+      "visual_properties": {}
+    },
+    "skin:garlic": {
+      "concept_type": "skin:garlic",
+      "tool": true,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "cuttable_object",
+        "non_heavy_object",
+        "food"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 96 classifier observations across real video. Top actions: cut(54), move_to(37), grasp(3)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.601638",
+      "visual_properties": {}
+    },
+    "thigh:chicken": {
+      "concept_type": "thigh:chicken",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 54 classifier observations across real video. Top actions: grasp(27), press(13), move_to(11)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.601740",
+      "visual_properties": {}
+    },
+    "cucumber": {
+      "concept_type": "cucumber",
+      "tool": true,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "cuttable_object",
+        "non_heavy_object",
+        "food"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 40 classifier observations across real video. Top actions: move_to(18), cut(18), grasp(3)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.601861",
+      "visual_properties": {}
+    },
+    "bowl": {
+      "concept_type": "bowl",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 30 classifier observations across real video. Top actions: move_to(16), grasp(8), press(5)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.601961",
+      "visual_properties": {}
+    },
+    "bottle": {
+      "concept_type": "bottle",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 22 classifier observations across real video. Top actions: move_to(16), grasp(4), open(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.602091",
+      "visual_properties": {}
+    },
+    "garlic": {
+      "concept_type": "garlic",
+      "tool": true,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "cuttable_object",
+        "non_heavy_object",
+        "food"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 18 classifier observations across real video. Top actions: move_to(9), grasp(7), actuate(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.602207",
+      "visual_properties": {}
+    },
+    "bottle:cooking:wine": {
+      "concept_type": "bottle:cooking:wine",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 12 classifier observations across real video. Top actions: move_to(7), grasp(3), press(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.602328",
+      "visual_properties": {}
+    },
+    "garlic:smashed": {
+      "concept_type": "garlic:smashed",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 12 classifier observations across real video. Top actions: move_to(12)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.602460",
+      "visual_properties": {}
+    },
+    "coriander": {
+      "concept_type": "coriander",
+      "tool": true,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "cuttable_object",
+        "non_heavy_object",
+        "food"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 12 classifier observations across real video. Top actions: move_to(4), cut(2), remove_from(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.602591",
+      "visual_properties": {}
+    },
+    "drawer": {
+      "concept_type": "drawer",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 10 classifier observations across real video. Top actions: actuate(4), open(3), close(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.602772",
+      "visual_properties": {}
+    },
+    "tray:plastic": {
+      "concept_type": "tray:plastic",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 8 classifier observations across real video. Top actions: move_to(3), grasp(3), actuate(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.602905",
+      "visual_properties": {}
+    },
+    "bottle:soy:sauce": {
+      "concept_type": "bottle:soy:sauce",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 8 classifier observations across real video. Top actions: move_to(8)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.603049",
+      "visual_properties": {}
+    },
+    "spatula": {
+      "concept_type": "spatula",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 8 classifier observations across real video. Top actions: actuate(3), grasp(3), move_to(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.603212",
+      "visual_properties": {}
+    },
+    "lid": {
+      "concept_type": "lid",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 8 classifier observations across real video. Top actions: close(4), move_to(3), actuate(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.603381",
+      "visual_properties": {}
+    },
+    "cucumber:sliced": {
+      "concept_type": "cucumber:sliced",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 8 classifier observations across real video. Top actions: move_to(6), grasp(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.603532",
+      "visual_properties": {}
+    },
+    "onion": {
+      "concept_type": "onion",
+      "tool": true,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "cuttable_object",
+        "non_heavy_object",
+        "food"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 8 classifier observations across real video. Top actions: move_to(3), cut(2), press(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.603699",
+      "visual_properties": {}
+    },
+    "cupboard": {
+      "concept_type": "cupboard",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 6 classifier observations across real video. Top actions: actuate(2), open(2), move_to(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.603867",
+      "visual_properties": {}
+    },
+    "board:chopping": {
+      "concept_type": "board:chopping",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 6 classifier observations across real video. Top actions: move_to(4), grasp(1), rotate(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.604043",
+      "visual_properties": {}
+    },
+    "pot:cooking": {
+      "concept_type": "pot:cooking",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 6 classifier observations across real video. Top actions: grasp(2), move_to(1), actuate(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.604223",
+      "visual_properties": {}
+    },
+    "pan": {
+      "concept_type": "pan",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 6 classifier observations across real video. Top actions: move_to(6)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.604416",
+      "visual_properties": {}
+    },
+    "fridge": {
+      "concept_type": "fridge",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: actuate(2), open(1), close(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.604614",
+      "visual_properties": {}
+    },
+    "stool": {
+      "concept_type": "stool",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: actuate(2), move_to(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.604851",
+      "visual_properties": {}
+    },
+    "towel:cleaning": {
+      "concept_type": "towel:cleaning",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: press(2), move_to(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.605060",
+      "visual_properties": {}
+    },
+    "box:plastic": {
+      "concept_type": "box:plastic",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: move_to(2), open(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.605271",
+      "visual_properties": {}
+    },
+    "hob:induction": {
+      "concept_type": "hob:induction",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: press(2), actuate(1), move_to(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.605492",
+      "visual_properties": {}
+    },
+    "bottle:oil": {
+      "concept_type": "bottle:oil",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: move_to(2), grasp(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.605712",
+      "visual_properties": {}
+    },
+    "garlic:sliced": {
+      "concept_type": "garlic:sliced",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: move_to(2), remove_from(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.605933",
+      "visual_properties": {}
+    },
+    "bag:packing": {
+      "concept_type": "bag:packing",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: grasp(2), move_to(1), actuate(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.606164",
+      "visual_properties": {}
+    },
+    "hand": {
+      "concept_type": "hand",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 4 classifier observations across real video. Top actions: press(2), rotate(2)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.606395",
+      "visual_properties": {}
+    },
+    "switch": {
+      "concept_type": "switch",
+      "tool": false,
+      "affordances": [
+        "placement_surface",
+        "movable",
+        "non_heavy_object"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 2 classifier observations across real video. Top actions: move_to(1), press(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.606632",
+      "visual_properties": {}
+    },
+    "wine:cooking": {
+      "concept_type": "wine:cooking",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Learned from 2 classifier observations across real video. Top actions: press(1), open(1)",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "classifier_observations",
+      "timestamp": "2026-08-20T07:15:03.606873",
+      "visual_properties": {}
+    },
+    "plate": {
+      "concept_type": "plate",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: plate",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:40:59.314671",
+      "visual_properties": {}
+    },
+    "strip:carrot": {
+      "concept_type": "strip:carrot",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: strip:carrot",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:40:59.315129",
+      "visual_properties": {}
+    },
+    "carrot": {
+      "concept_type": "carrot",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: carrot",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:40:59.315441",
+      "visual_properties": {}
+    },
+    "brush:dish": {
+      "concept_type": "brush:dish",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: brush:dish",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:40:59.315725",
+      "visual_properties": {}
+    },
+    "pot": {
+      "concept_type": "pot",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: pot",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:40:59.316013",
+      "visual_properties": {}
+    },
+    "carrot:diced": {
+      "concept_type": "carrot:diced",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: carrot:diced",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:40:59.316315",
+      "visual_properties": {}
+    },
+    "stick:carrot": {
+      "concept_type": "stick:carrot",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: stick:carrot",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 1,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:40:59.316617",
+      "visual_properties": {}
+    },
+    "bone:chicken": {
+      "concept_type": "bone:chicken",
+      "tool": false,
+      "affordances": [
+        "inspectable"
+      ],
+      "physical_properties": {},
+      "contextual_info": "Unknown object: bone:chicken",
+      "safety_level": "caution",
+      "living_organism": false,
+      "usage_count": 0,
+      "learned_from": "default",
+      "timestamp": "2026-08-20T13:41:15.918874",
+      "visual_properties": {}
+    }
+  },
+  "statistics": {
+    "total_concepts": 42,
+    "timestamp": "2026-08-20T13:41:15.918926"
+  }
+}

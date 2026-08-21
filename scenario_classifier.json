@@ -1,0 +1,1713 @@
+{
+  "goal": "Perform robot task",
+  "detected_objects": [
+    "cucumber:sliced",
+    "tap",
+    "spatula",
+    "board:chopping",
+    "drawer",
+    "tray:plastic",
+    "fridge",
+    "box:plastic",
+    "lid",
+    "hand",
+    "bottle:cooking:wine",
+    "bowl",
+    "garlic:sliced",
+    "garlic:smashed",
+    "coriander",
+    "onion",
+    "bottle:soy:sauce",
+    "bag:packing",
+    "pan",
+    "towel:cleaning",
+    "stool",
+    "wine:cooking",
+    "skin:garlic",
+    "knife",
+    "garlic",
+    "switch",
+    "bottle",
+    "cucumber",
+    "bottle:oil",
+    "pot:cooking",
+    "thigh:chicken",
+    "hob:induction",
+    "cupboard"
+  ],
+  "target_objects": [
+    "cucumber:sliced",
+    "tap",
+    "spatula",
+    "board:chopping",
+    "drawer",
+    "tray:plastic",
+    "fridge",
+    "box:plastic",
+    "lid",
+    "hand",
+    "bottle:cooking:wine",
+    "bowl",
+    "garlic:sliced",
+    "garlic:smashed",
+    "coriander",
+    "onion",
+    "bottle:soy:sauce",
+    "bag:packing",
+    "pan",
+    "towel:cleaning",
+    "stool",
+    "wine:cooking",
+    "skin:garlic",
+    "knife",
+    "garlic",
+    "switch",
+    "bottle",
+    "cucumber",
+    "bottle:oil",
+    "pot:cooking",
+    "thigh:chicken",
+    "hob:induction",
+    "cupboard"
+  ],
+  "required_actions": [
+    "press",
+    "cut",
+    "rotate",
+    "actuate",
+    "move_to"
+  ],
+  "object_positions": {
+    "fridge": [
+      1028.73046875,
+      840.9752655029297,
+      0.0
+    ],
+    "robot_right_hand": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "tray:plastic": [
+      1082.8882598876953,
+      889.171793460846,
+      0.0
+    ],
+    "stool": [
+      1471.937026977539,
+      842.3310256004333,
+      0.0
+    ],
+    "drawer": [
+      977.7074432373047,
+      971.4723086357117,
+      0.0
+    ],
+    "cupboard": [
+      1349.2303848266602,
+      478.16450357437134,
+      0.0
+    ],
+    "tap": [
+      738.3531761169434,
+      911.5434765815735,
+      0.0
+    ],
+    "towel:cleaning": [
+      1158.830337524414,
+      655.8591985702515,
+      0.0
+    ],
+    "knife": [
+      1230.6620407104492,
+      803.6089181900024,
+      0.0
+    ],
+    "box:plastic": [
+      901.0551452636719,
+      835.3656721115112,
+      0.0
+    ],
+    "bowl": [
+      1136.7753982543945,
+      364.83323335647583,
+      0.0
+    ],
+    "thigh:chicken": [
+      1185.0501251220703,
+      713.7609887123108,
+      0.0
+    ],
+    "switch": [
+      1270.9469604492188,
+      1041.4287185668945,
+      0.0
+    ],
+    "hob:induction": [
+      1328.433494567871,
+      994.6590185165405,
+      0.0
+    ],
+    "bottle:oil": [
+      1467.0988082885742,
+      555.890543460846,
+      0.0
+    ],
+    "garlic": [
+      1259.3122100830078,
+      133.6389210820198,
+      0.0
+    ],
+    "bottle:soy:sauce": [
+      1354.9312591552734,
+      884.5837354660034,
+      0.0
+    ],
+    "bottle:cooking:wine": [
+      927.1419525146484,
+      824.275553226471,
+      0.0
+    ],
+    "bottle": [
+      556.1172294616699,
+      781.3987469673157,
+      0.0
+    ],
+    "board:chopping": [
+      1484.9915313720703,
+      925.4486274719238,
+      0.0
+    ],
+    "cucumber": [
+      1304.813003540039,
+      973.5350131988525,
+      0.0
+    ],
+    "skin:garlic": [
+      850.7769584655762,
+      653.8918948173523,
+      0.0
+    ],
+    "pot:cooking": [
+      1475.4242706298828,
+      767.616548538208,
+      0.0
+    ],
+    "spatula": [
+      1393.8149642944336,
+      636.5006232261658,
+      0.0
+    ],
+    "garlic:sliced": [
+      847.8261566162109,
+      535.8067095279694,
+      0.0
+    ],
+    "pan": [
+      998.9872741699219,
+      740.692663192749,
+      0.0
+    ],
+    "wine:cooking": [
+      1465.9961700439453,
+      649.807620048523,
+      0.0
+    ],
+    "lid": [
+      1637.1887969970703,
+      641.4487838745117,
+      0.0
+    ],
+    "garlic:smashed": [
+      1002.2847747802734,
+      521.7046093940735,
+      0.0
+    ],
+    "bag:packing": [
+      1482.916374206543,
+      293.50194454193115,
+      0.0
+    ],
+    "coriander": [
+      1325.7840728759766,
+      745.0723457336426,
+      0.0
+    ],
+    "cucumber:sliced": [
+      1462.0994567871094,
+      762.1734881401062,
+      0.0
+    ],
+    "onion": [
+      785.8502197265625,
+      988.8337755203247,
+      0.0
+    ],
+    "hand": [
+      1187.3447799682617,
+      888.2575678825378,
+      0.0
+    ]
+  },
+  "edge_labels": {
+    "('robot_right_hand', np.str_('actuate'), 'fridge')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'tray:plastic')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'stool')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'drawer')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'cupboard')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'cupboard')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'tap')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'tap')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'towel:cleaning')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'drawer')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'knife')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'box:plastic')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'bowl')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'bowl')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'tray:plastic')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'thigh:chicken')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'thigh:chicken')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'thigh:chicken')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'tray:plastic')": 0.3,
+    "('robot_right_hand', np.str_('rotate'), 'tap')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'switch')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'hob:induction')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'bottle:oil')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'garlic')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'bottle:soy:sauce')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'bottle:cooking:wine')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'bottle')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'garlic')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'board:chopping')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'cucumber')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'cucumber')": 0.3,
+    "('robot_right_hand', np.str_('cut'), 'cucumber')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'skin:garlic')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'tap')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'skin:garlic')": 0.3,
+    "('robot_right_hand', np.str_('cut'), 'skin:garlic')": 0.3,
+    "('robot_right_hand', np.str_('cut'), 'garlic')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'pot:cooking')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'skin:garlic')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'spatula')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'knife')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'garlic:sliced')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'spatula')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'pot:cooking')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'pot:cooking')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'pan')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'wine:cooking')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'lid')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'bottle:cooking:wine')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'hob:induction')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'garlic:smashed')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'bottle:cooking:wine')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'lid')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'bag:packing')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'bag:packing')": 0.3,
+    "('robot_right_hand', np.str_('actuate'), 'coriander')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'coriander')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'coriander')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'cucumber:sliced')": 0.3,
+    "('robot_right_hand', np.str_('move_to'), 'onion')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'onion')": 0.3,
+    "('robot_right_hand', np.str_('press'), 'hand')": 0.3
+  },
+  "semantic_line": [
+    {
+      "action": "actuate",
+      "object": "fridge",
+      "confidence": 0.9041417241096497
+    },
+    {
+      "action": "actuate",
+      "object": "fridge",
+      "confidence": 0.8850871324539185
+    },
+    {
+      "action": "actuate",
+      "object": "tray:plastic",
+      "confidence": 0.8650271892547607
+    },
+    {
+      "action": "actuate",
+      "object": "stool",
+      "confidence": 0.41103413701057434
+    },
+    {
+      "action": "actuate",
+      "object": "stool",
+      "confidence": 0.7064623832702637
+    },
+    {
+      "action": "actuate",
+      "object": "drawer",
+      "confidence": 0.7565615177154541
+    },
+    {
+      "action": "actuate",
+      "object": "drawer",
+      "confidence": 0.822425127029419
+    },
+    {
+      "action": "actuate",
+      "object": "drawer",
+      "confidence": 0.7495706081390381
+    },
+    {
+      "action": "actuate",
+      "object": "drawer",
+      "confidence": 0.9005792737007141
+    },
+    {
+      "action": "actuate",
+      "object": "cupboard",
+      "confidence": 0.8824144005775452
+    },
+    {
+      "action": "actuate",
+      "object": "cupboard",
+      "confidence": 0.864154577255249
+    },
+    {
+      "action": "move_to",
+      "object": "cupboard",
+      "confidence": 0.39115241169929504
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.3915160000324249
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7135711908340454
+    },
+    {
+      "action": "press",
+      "object": "towel:cleaning",
+      "confidence": 0.7725488543510437
+    },
+    {
+      "action": "press",
+      "object": "towel:cleaning",
+      "confidence": 0.7287755608558655
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.5858955383300781
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.6617599129676819
+    },
+    {
+      "action": "move_to",
+      "object": "drawer",
+      "confidence": 0.43023836612701416
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.8114125728607178
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7866544127464294
+    },
+    {
+      "action": "move_to",
+      "object": "box:plastic",
+      "confidence": 0.6776214241981506
+    },
+    {
+      "action": "move_to",
+      "object": "box:plastic",
+      "confidence": 0.5886977910995483
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.6213235259056091
+    },
+    {
+      "action": "press",
+      "object": "bowl",
+      "confidence": 0.4567708671092987
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8174469470977783
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.782503068447113
+    },
+    {
+      "action": "move_to",
+      "object": "tray:plastic",
+      "confidence": 0.5115039348602295
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.703754723072052
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.7511487007141113
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.4617246985435486
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.7603256702423096
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.7847163081169128
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.7477769255638123
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.5354159474372864
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.6608343720436096
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.8311120867729187
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.4785633683204651
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.8377246856689453
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.5240373611450195
+    },
+    {
+      "action": "actuate",
+      "object": "thigh:chicken",
+      "confidence": 0.3408210277557373
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.5363144278526306
+    },
+    {
+      "action": "actuate",
+      "object": "thigh:chicken",
+      "confidence": 0.4097152650356293
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.5936277508735657
+    },
+    {
+      "action": "press",
+      "object": "tray:plastic",
+      "confidence": 0.6547980904579163
+    },
+    {
+      "action": "move_to",
+      "object": "tray:plastic",
+      "confidence": 0.4031749963760376
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.6564257740974426
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.8291544914245605
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7966368198394775
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7596303224563599
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7474778890609741
+    },
+    {
+      "action": "rotate",
+      "object": "tap",
+      "confidence": 0.5842258334159851
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.707686185836792
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.7398178577423096
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.4370019733905792
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8148298263549805
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7019294500350952
+    },
+    {
+      "action": "move_to",
+      "object": "switch",
+      "confidence": 0.7007355093955994
+    },
+    {
+      "action": "actuate",
+      "object": "hob:induction",
+      "confidence": 0.7936195731163025
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:oil",
+      "confidence": 0.7405790090560913
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:oil",
+      "confidence": 0.5667459964752197
+    },
+    {
+      "action": "actuate",
+      "object": "garlic",
+      "confidence": 0.45234471559524536
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce",
+      "confidence": 0.4699348211288452
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce",
+      "confidence": 0.6767449975013733
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:cooking:wine",
+      "confidence": 0.716886579990387
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.6416491866111755
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.5029371380805969
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.6810207962989807
+    },
+    {
+      "action": "move_to",
+      "object": "garlic",
+      "confidence": 0.6810207962989807
+    },
+    {
+      "action": "move_to",
+      "object": "garlic",
+      "confidence": 0.579367458820343
+    },
+    {
+      "action": "move_to",
+      "object": "garlic",
+      "confidence": 0.8046894073486328
+    },
+    {
+      "action": "move_to",
+      "object": "garlic",
+      "confidence": 0.7825409173965454
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.806315004825592
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.7689487338066101
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.7820951342582703
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.7045410871505737
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.8045583963394165
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.6252924203872681
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.6784854531288147
+    },
+    {
+      "action": "move_to",
+      "object": "bottle",
+      "confidence": 0.7932740449905396
+    },
+    {
+      "action": "move_to",
+      "object": "board:chopping",
+      "confidence": 0.429412841796875
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7759053111076355
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.780181348323822
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.6701178550720215
+    },
+    {
+      "action": "move_to",
+      "object": "board:chopping",
+      "confidence": 0.7954729795455933
+    },
+    {
+      "action": "move_to",
+      "object": "board:chopping",
+      "confidence": 0.8032360076904297
+    },
+    {
+      "action": "actuate",
+      "object": "cucumber",
+      "confidence": 0.669986367225647
+    },
+    {
+      "action": "press",
+      "object": "bowl",
+      "confidence": 0.7950239777565002
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.709527313709259
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8172630071640015
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.6903737187385559
+    },
+    {
+      "action": "press",
+      "object": "bowl",
+      "confidence": 0.5213317275047302
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.6999589204788208
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.6329354643821716
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.4531221091747284
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8235025405883789
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7238652110099792
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.47275078296661377
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.6699666380882263
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.6102519035339355
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8278437852859497
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8375641107559204
+    },
+    {
+      "action": "cut",
+      "object": "cucumber",
+      "confidence": 0.5302146077156067
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.3430304527282715
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.6760821342468262
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.6613794565200806
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.5285032987594604
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.5307623147964478
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.605995237827301
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.7195376753807068
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.6124931573867798
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7340639233589172
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7262735366821289
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.6182270646095276
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.8103708624839783
+    },
+    {
+      "action": "cut",
+      "object": "cucumber",
+      "confidence": 0.5517433881759644
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.6573485732078552
+    },
+    {
+      "action": "cut",
+      "object": "cucumber",
+      "confidence": 0.4912041127681732
+    },
+    {
+      "action": "move_to",
+      "object": "garlic",
+      "confidence": 0.8135015368461609
+    },
+    {
+      "action": "move_to",
+      "object": "garlic",
+      "confidence": 0.785309910774231
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6615716218948364
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.431804895401001
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6585490107536316
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.7051035761833191
+    },
+    {
+      "action": "cut",
+      "object": "cucumber",
+      "confidence": 0.5479159951210022
+    },
+    {
+      "action": "press",
+      "object": "bowl",
+      "confidence": 0.8088761568069458
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8249362111091614
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8225449919700623
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8132282495498657
+    },
+    {
+      "action": "actuate",
+      "object": "tap",
+      "confidence": 0.38749152421951294
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.4687367081642151
+    },
+    {
+      "action": "actuate",
+      "object": "skin:garlic",
+      "confidence": 0.25837182998657227
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.5728870034217834
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7546207904815674
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7669827342033386
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7174079418182373
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.9260975122451782
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.37050050497055054
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6307689547538757
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.4781270921230316
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.8081310391426086
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6209046840667725
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6236827373504639
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6849297285079956
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7306281328201294
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.8751474618911743
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.5494914054870605
+    },
+    {
+      "action": "move_to",
+      "object": "garlic",
+      "confidence": 0.5740469098091125
+    },
+    {
+      "action": "cut",
+      "object": "garlic",
+      "confidence": 0.8594326972961426
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.429876446723938
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6344752311706543
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.6375138163566589
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7870568037033081
+    },
+    {
+      "action": "move_to",
+      "object": "pot:cooking",
+      "confidence": 0.412483811378479
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.613996684551239
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.45938625931739807
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.4291878938674927
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.3651729226112366
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.3591899871826172
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7804523706436157
+    },
+    {
+      "action": "press",
+      "object": "skin:garlic",
+      "confidence": 0.2529420256614685
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7687526345252991
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6515868902206421
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.3119466006755829
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6497312188148499
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.5044139623641968
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.9757468700408936
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6702098846435547
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.2985956072807312
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic",
+      "confidence": 0.8909754753112793
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.4246804714202881
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6938598155975342
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6283423900604248
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.5959699153900146
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7952083945274353
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.6713528633117676
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7947824001312256
+    },
+    {
+      "action": "move_to",
+      "object": "skin:garlic",
+      "confidence": 0.7142729759216309
+    },
+    {
+      "action": "actuate",
+      "object": "tap",
+      "confidence": 0.7088250517845154
+    },
+    {
+      "action": "actuate",
+      "object": "spatula",
+      "confidence": 0.748324990272522
+    },
+    {
+      "action": "actuate",
+      "object": "knife",
+      "confidence": 0.5391604900360107
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.8054662346839905
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:sliced",
+      "confidence": 0.5581803917884827
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:sliced",
+      "confidence": 0.686324417591095
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.7030444741249084
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.5604864358901978
+    },
+    {
+      "action": "actuate",
+      "object": "spatula",
+      "confidence": 0.3989034593105316
+    },
+    {
+      "action": "actuate",
+      "object": "spatula",
+      "confidence": 0.6048374176025391
+    },
+    {
+      "action": "move_to",
+      "object": "spatula",
+      "confidence": 0.481224000453949
+    },
+    {
+      "action": "actuate",
+      "object": "pot:cooking",
+      "confidence": 0.6983349323272705
+    },
+    {
+      "action": "press",
+      "object": "pot:cooking",
+      "confidence": 0.7474530935287476
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8268693685531616
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8078860640525818
+    },
+    {
+      "action": "press",
+      "object": "bowl",
+      "confidence": 0.8016471266746521
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.6893507838249207
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.8068395256996155
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.41470569372177124
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.4433755576610565
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.5657797455787659
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.6113656163215637
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.4032260775566101
+    },
+    {
+      "action": "actuate",
+      "object": "thigh:chicken",
+      "confidence": 0.31522613763809204
+    },
+    {
+      "action": "press",
+      "object": "thigh:chicken",
+      "confidence": 0.648419976234436
+    },
+    {
+      "action": "move_to",
+      "object": "thigh:chicken",
+      "confidence": 0.4682689309120178
+    },
+    {
+      "action": "move_to",
+      "object": "pan",
+      "confidence": 0.5973285436630249
+    },
+    {
+      "action": "move_to",
+      "object": "pan",
+      "confidence": 0.35672727227211
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.3915771543979645
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.5174117088317871
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7064869403839111
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7708360552787781
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8221297860145569
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7863947153091431
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:cooking:wine",
+      "confidence": 0.7626477479934692
+    },
+    {
+      "action": "press",
+      "object": "wine:cooking",
+      "confidence": 0.40111660957336426
+    },
+    {
+      "action": "move_to",
+      "object": "lid",
+      "confidence": 0.33683934807777405
+    },
+    {
+      "action": "move_to",
+      "object": "lid",
+      "confidence": 0.6474801898002625
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7122364044189453
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.5553250312805176
+    },
+    {
+      "action": "press",
+      "object": "bottle:cooking:wine",
+      "confidence": 0.5642463564872742
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:cooking:wine",
+      "confidence": 0.4585375189781189
+    },
+    {
+      "action": "move_to",
+      "object": "pan",
+      "confidence": 0.5271801352500916
+    },
+    {
+      "action": "move_to",
+      "object": "hob:induction",
+      "confidence": 0.5582314133644104
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce",
+      "confidence": 0.5450384020805359
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce",
+      "confidence": 0.819057047367096
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.7258049249649048
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.8210713267326355
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.6586606502532959
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed",
+      "confidence": 0.6149078011512756
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed",
+      "confidence": 0.7073251008987427
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed",
+      "confidence": 0.4665881395339966
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed",
+      "confidence": 0.5910207629203796
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed",
+      "confidence": 0.7334157228469849
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed",
+      "confidence": 0.7847004532814026
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.7023943066596985
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.6802923679351807
+    },
+    {
+      "action": "actuate",
+      "object": "tap",
+      "confidence": 0.49715927243232727
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7774698138237
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8088187575340271
+    },
+    {
+      "action": "actuate",
+      "object": "bottle:cooking:wine",
+      "confidence": 0.3855133354663849
+    },
+    {
+      "action": "actuate",
+      "object": "lid",
+      "confidence": 0.3810618817806244
+    },
+    {
+      "action": "move_to",
+      "object": "lid",
+      "confidence": 0.7066656351089478
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:cooking:wine",
+      "confidence": 0.4529271125793457
+    },
+    {
+      "action": "move_to",
+      "object": "bag:packing",
+      "confidence": 0.5997616052627563
+    },
+    {
+      "action": "actuate",
+      "object": "bag:packing",
+      "confidence": 0.42190513014793396
+    },
+    {
+      "action": "actuate",
+      "object": "coriander",
+      "confidence": 0.5203325152397156
+    },
+    {
+      "action": "move_to",
+      "object": "tap",
+      "confidence": 0.7828328013420105
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.46571770310401917
+    },
+    {
+      "action": "press",
+      "object": "coriander",
+      "confidence": 0.8550794124603271
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.7507976293563843
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8155930638313293
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.8541306853294373
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.6056019067764282
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.7168788909912109
+    },
+    {
+      "action": "move_to",
+      "object": "bowl",
+      "confidence": 0.7476536631584167
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.7593011260032654
+    },
+    {
+      "action": "move_to",
+      "object": "knife",
+      "confidence": 0.6518903970718384
+    },
+    {
+      "action": "move_to",
+      "object": "coriander",
+      "confidence": 0.7235568165779114
+    },
+    {
+      "action": "move_to",
+      "object": "coriander",
+      "confidence": 0.7767033576965332
+    },
+    {
+      "action": "move_to",
+      "object": "coriander",
+      "confidence": 0.6956325769424438
+    },
+    {
+      "action": "move_to",
+      "object": "coriander",
+      "confidence": 0.715759813785553
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber:sliced",
+      "confidence": 0.5858476161956787
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber:sliced",
+      "confidence": 0.4001752436161041
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.6941359043121338
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber",
+      "confidence": 0.5739235877990723
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber:sliced",
+      "confidence": 0.6160520911216736
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber:sliced",
+      "confidence": 0.7669724822044373
+    },
+    {
+      "action": "move_to",
+      "object": "onion",
+      "confidence": 0.6960312128067017
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.849823534488678
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7150272727012634
+    },
+    {
+      "action": "press",
+      "object": "onion",
+      "confidence": 0.8072963953018188
+    },
+    {
+      "action": "move_to",
+      "object": "onion",
+      "confidence": 0.3452000319957733
+    },
+    {
+      "action": "move_to",
+      "object": "onion",
+      "confidence": 0.5837185978889465
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7396795153617859
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7043981552124023
+    },
+    {
+      "action": "actuate",
+      "object": "tap",
+      "confidence": 0.5782214403152466
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.6835813522338867
+    },
+    {
+      "action": "press",
+      "object": "tap",
+      "confidence": 0.7070296406745911
+    },
+    {
+      "action": "press",
+      "object": "hand",
+      "confidence": 0.5854474902153015
+    },
+    {
+      "action": "press",
+      "object": "hand",
+      "confidence": 0.7140737175941467
+    }
+  ]
+}

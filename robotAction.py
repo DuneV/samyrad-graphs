@@ -1,56 +1,118 @@
-# class robot Action
-
 from dataclasses import dataclass
 import pandas as pd
 
 
 @dataclass
-class Action:
+class action:
     name: str
 
 
-ROBOT_ACTIONS = [
-    Action(name="grasp"), Action(name="release"), Action(name="push"),
-    Action(name="pull"),  Action(name="lift"),    Action(name="lower"),
-    Action(name="rotate"),Action(name="twist"),   Action(name="slide"),
-    Action(name="squeeze"),
-]
+ROBOT_ACTIONS = [action(name=n) for n in
+    ["grasp", "release", "push", "pull", "lift", "lower",
+     "rotate", "twist", "slide", "squeeze"]]
 ROBOT_ACTION_NAMES = {a.name for a in ROBOT_ACTIONS}
 
+
+# ── IMPORTANTE ────────────────────────────────────────────────────────
+# Este mapeo apunta al vocabulario de 12 acciones que CLIP realmente
+# puede predecir (definido en storyTelling.py: CANDIDATE_ACTIONS /
+# CLIP_TO_ACTION), NO al de las 10 primitivas cinemáticas de arriba
+# (ROBOT_ACTIONS). Son dos vocabularios distintos en tu proyecto:
+#
+#   - ROBOT_ACTIONS (10 primitivas): grasp, release, push, pull, lift,
+#     lower, rotate, twist, slide, squeeze — pensado para control de
+#     bajo nivel del robot.
+#   - CLIP_TO_ACTION (12 acciones semánticas): grasp, move_to, pour,
+#     cut, open, close, push, pull, press, rotate, inspect, remove_from
+#     — es lo que CLIP clasifica y lo que arma edge_labels/semantic_line.
+#
+# EPIC_TO_ROBOT se usa para comparar el ground truth de EPIC-KITCHENS
+# contra lo que predice CLIP (evaluate_detector_vs_gt /
+# evaluate_chunks_against_gt.py) — por eso DEBE mapear al vocabulario
+# de CLIP. Si en algún momento comparas contra las 10 primitivas
+# cinemáticas en cambio, necesitas un segundo diccionario aparte.
+CLIP_ACTION_VOCAB = {
+    "grasp", "move_to", "pour", "cut", "open", "close",
+    "push", "pull", "press", "rotate", "inspect", "remove_from",
+}
+
 EPIC_TO_ROBOT = {
-    "take": "grasp",     "put": "release",   "wash": None,
-    "open": "pull",      "close": "push",    "insert": "slide",
-    "turn-on": "rotate", "cut": None,        "turn-off": "rotate",
-    "pour": "rotate",    "mix": "rotate",    "move": "slide",
-    "remove": "pull",    "throw": "release", "dry": None,
-    "shake": None,       "scoop": "lift",    "adjust": "rotate",
-    "squeeze": "squeeze","peel": "pull",     "empty": "rotate",
-    "press": "push",     "flip": "rotate",   "turn": "rotate",
-    "check": None,       "scrape": "slide",  "fill": None,
-    "apply": None,       "fold": None,       "scrub": None,
-    "break": "pull",     "pull": "pull",     "pat": "push",
-    "lift": "lift",      "hold": "grasp",    "eat": None,
-    "wrap": None,        "filter": None,     "look": None,
-    "unroll": "pull",    "sort": None,       "hang": "lift",
-    "sprinkle": None,    "rip": "pull",      "spray": "squeeze",
-    "cook": None,        "add": None,        "roll": "rotate",
-    "search": None,      "crush": "squeeze", "stretch": "pull",
-    "knead": "squeeze",  "divide": "pull",   "set": None,
-    "feel": None,        "rub": None,        "soak": None,
-    "brush": None,       "sharpen": None,    "drop": "release",
-    "drink": None,       "slide": "slide",   "water": None,
-    "gather": "grasp",   "attach": "push",   "turn-down": "rotate",
-    "coat": None,        "transition": None, "wear": None,
-    "measure": None,     "increase": "rotate","unscrew": "twist",
-    "wait": None,        "lower": "lower",   "form": "squeeze",
-    "smell": None,       "use": None,        "grate": None,
-    "screw": "twist",    "let-go": "release","finish": None,
-    "stab": "push",      "serve": "release", "uncover": "pull",
-    "unwrap": "pull",    "choose": None,     "lock": "rotate",
-    "flatten": "push",   "switch": "push",   "carry": "grasp",
-    "season": None,      "unlock": "rotate", "prepare": None,
-    "bake": None,        "mark": None,       "bend": None,
-    "unfreeze": None,
+    "add":        None,
+    "adjust":     "rotate",
+    "apply":      "press",
+    "attach":     "push",
+    "break":      None,
+    "brush":      None,
+    "carry":      "move_to",
+    "check":      "inspect",
+    "choose":     None,
+    "close":      "close",
+    "coat":       None,
+    "cook":       None,
+    "crush":      "press",
+    "cut":        "cut",
+    "divide":     "cut",
+    "drink":      None,
+    "dry":        None,
+    "empty":      "pour",
+    "fill":       "pour",
+    "filter":     None,
+    "flatten":    "press",
+    "flip":       "rotate",
+    "form":       None,
+    "gather":     "grasp",
+    "hold":       "grasp",
+    "increase":   "rotate",
+    "insert":     "push",
+    "knead":      "press",
+    "lift":       "grasp",
+    "lower":      "push",
+    "mix":        "rotate",
+    "move":       "move_to",
+    "open":       "open",
+    "pat":        "press",
+    "peel":       "cut",
+    "pour":       "pour",
+    "press":      "press",
+    "pull":       "pull",
+    "put":        "move_to",
+    "put-down":   "move_to",
+    "put-into":   "move_to",
+    "put-onto":   "move_to",
+    "remove":     "remove_from",
+    "rip":        "cut",
+    "roll":       "rotate",
+    "rub":        "press",
+    "scoop":      "grasp",
+    "scrape":     "pull",
+    "screw":      "rotate",
+    "scrub":      "press",
+    "season":     None,
+    "serve":      "move_to",
+    "set":        "move_to",
+    "shake":      "rotate",
+    "sharpen":    None,
+    "slide":      "push",
+    "soak":       None,
+    "sort":       None,
+    "spray":      "press",
+    "sprinkle":   None,
+    "squeeze":    "press",
+    "stab":       "cut",
+    "stretch":    "pull",
+    "take":       "grasp",
+    "throw":      "move_to",
+    "turn":       "rotate",
+    "turn-down":  "rotate",
+    "turn-off":   "press",
+    "turn-on":    "press",
+    "uncover":    "open",
+    "unroll":     "pull",
+    "unscrew":    "rotate",
+    "unwrap":     "open",
+    "use":        None,
+    "wash":       None,
+    "wrap":       "close",
 }
 
 
@@ -61,27 +123,18 @@ class RobotActions:
 
         missing = set(self.epic_verbs) - EPIC_TO_ROBOT.keys()
         if missing:
-            print(f"Verbos EPIC sin entrada en el mapeo: {sorted(missing)}")
+            print(f"⚠ Verbos EPIC sin entrada en el mapeo: {sorted(missing)}")
 
         self.mapped = {
             verb: EPIC_TO_ROBOT[verb]
             for verb in self.epic_verbs
-            if EPIC_TO_ROBOT.get(verb) in ROBOT_ACTION_NAMES
+            if EPIC_TO_ROBOT.get(verb) is not None
         }
 
-    def robot_action_for(self, epic_verb: str) -> str | None:
+    def robot_action_for(self, epic_verb: str):
         return self.mapped.get(epic_verb)
-
-    def instances_by_robot_action(self) -> dict[str, list[str]]:
-        """Agrupa: primitiva robótica lista de verbos EPIC que la disparan."""
-        grouped: dict[str, list[str]] = {a: [] for a in ROBOT_ACTION_NAMES}
-        for verb, action in self.mapped.items():
-            grouped[action].append(verb)
-        return grouped
 
 
 if __name__ == "__main__":
-    ra = RobotActions("verb_classes.csv")
-    print(f"{len(ra.mapped)}/{len(ra.epic_verbs)} verbos EPIC mapeados a primitivas robot\n")
-    for action, verbs in ra.instances_by_robot_action().items():
-        print(f"{action:10s} <- {verbs}")
+    print(f"{len(EPIC_TO_ROBOT)} verbos EPIC mapeados")
+    print(f"{sum(1 for v in EPIC_TO_ROBOT.values() if v is not None)} con equivalente en el vocabulario de CLIP")

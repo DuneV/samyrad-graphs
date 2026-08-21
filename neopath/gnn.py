@@ -300,6 +300,43 @@ class WeightedHuberLoss(nn.Module):
         return (loss * weights).mean()
 
 
+class ConfidenceWeightedHuberLoss(nn.Module):
+    """
+    Igual que WeightedHuberLoss, pero multiplica cada término del loss
+    por un peso extra de confianza por arista (edge_weights). Pensado
+    para que las aristas RELLENADAS POR HEURÍSTICA (cuando no se
+    observó la acción real en el video, ver _compute_heuristic_factor)
+    -- que son esencialmente datos inventados, no supervisión real --
+    pesen menos que las aristas con edge_labels explícito, y para que
+    predicciones de baja confianza del clasificador (si se pasa
+    edge_confidences) pesen menos que las de alta confianza.
+
+    Con edge_weights = todo 1.0 (comportamiento por defecto si no se
+    usa esta clase), el resultado es matemáticamente idéntico a
+    WeightedHuberLoss.
+    """
+
+    def __init__(self, delta=0.15):
+        super(ConfidenceWeightedHuberLoss, self).__init__()
+        self.delta = delta
+
+    def forward(self, pred, target, edge_weights=None):
+        weights = 1.0 / (target + 0.1)
+        weights = weights / weights.mean()
+
+        if edge_weights is not None:
+            weights = weights * edge_weights
+
+        diff = torch.abs(pred - target)
+        loss = torch.where(
+            diff < self.delta,
+            0.5 * diff ** 2,
+            self.delta * (diff - 0.5 * self.delta)
+        )
+
+        return (loss * weights).mean()
+
+
 class GNNCostOptimizer:
     """
     Sistema que integra GNN con el grafo semántico para optimizar costos.
@@ -463,9 +500,25 @@ class GNNTrainer:
                         epochs: int = 200,
                         validation_split: float = 0.2,
                         early_stopping_patience: int = 20,
-                        save_path: str = "gnn_cost_optimizer.pth"):
+                        save_path: str = "gnn_cost_optimizer.pth",
+                        use_confidence_weighting: bool = False,
+                        heuristic_edge_weight: float = 0.2):
         """
         Entrena con ejemplos etiquetados explícitamente.
+
+        use_confidence_weighting: si True, usa ConfidenceWeightedHuberLoss
+            en vez de WeightedHuberLoss -- las aristas rellenadas por
+            heurística (sin edge_labels explícito, ver
+            _compute_heuristic_factor) pesan heuristic_edge_weight en
+            vez de pesar igual que las aristas con supervisión real.
+            Si además cada labeled_example trae 'edge_confidences'
+            (mismo formato que edge_labels, valores en [0,1] -- ej. la
+            confianza que reportó el clasificador de acciones), esas
+            aristas explícitas se ponderan por esa confianza también.
+            Default False: comportamiento IDÉNTICO al original.
+        heuristic_edge_weight: peso de las aristas heurísticas cuando
+            use_confidence_weighting=True (default 0.2 = pesan 5x menos
+            que la supervisión real).
         
         Formato de labeled_examples:
         [
@@ -483,6 +536,10 @@ class GNNTrainer:
                     ('robot_gripper', 'grasp', 'cup'): 0.25,
                     ('cup', 'move', 'table'): 0.35,
                     ...
+                },
+                'edge_confidences': {   # OPCIONAL, solo si use_confidence_weighting=True
+                    ('robot_gripper', 'grasp', 'cup'): 0.87,
+                    ...
                 }
             },
             ...
@@ -490,11 +547,15 @@ class GNNTrainer:
         """
         print(f"\n{'='*60}")
         print(f"ENTRENAMIENTO SUPERVISADO GNN")
+        if use_confidence_weighting:
+            print(f"(ponderación por confianza activada, "
+                  f"heuristic_edge_weight={heuristic_edge_weight})")
         print(f"{'='*60}")
         
         training_data = []
         for example in labeled_examples:
-            training_example = self._convert_labeled_to_training(example)
+            training_example = self._convert_labeled_to_training(
+                example, heuristic_edge_weight=heuristic_edge_weight)
             if training_example:
                 training_data.append(training_example)
         
@@ -533,7 +594,10 @@ class GNNTrainer:
             lr=0.001,
             weight_decay=0.01
         )
-        criterion = WeightedHuberLoss(delta=0.15)
+        if use_confidence_weighting:
+            criterion = ConfidenceWeightedHuberLoss(delta=0.15)
+        else:
+            criterion = WeightedHuberLoss(delta=0.15)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, mode='min', factor=0.5, patience=10
         )
@@ -565,7 +629,13 @@ class GNNTrainer:
                     ).to(self.gnn_optimizer.device)
                     
                     pred_factors = self.gnn_optimizer.model(data, goal_emb)
-                    loss = criterion(pred_factors, target)
+                    if use_confidence_weighting:
+                        edge_weights_t = torch.tensor(
+                            example['edge_weights'], dtype=torch.float
+                        ).to(self.gnn_optimizer.device)
+                        loss = criterion(pred_factors, target, edge_weights_t)
+                    else:
+                        loss = criterion(pred_factors, target)
                     
                     loss.backward()
                     torch.nn.utils.clip_grad_norm_(
@@ -603,7 +673,13 @@ class GNNTrainer:
                         ).to(self.gnn_optimizer.device)
                         
                         pred_factors = self.gnn_optimizer.model(data, goal_emb)
-                        loss = criterion(pred_factors, target)
+                        if use_confidence_weighting:
+                            edge_weights_t = torch.tensor(
+                                example['edge_weights'], dtype=torch.float
+                            ).to(self.gnn_optimizer.device)
+                            loss = criterion(pred_factors, target, edge_weights_t)
+                        else:
+                            loss = criterion(pred_factors, target)
                         
                         val_loss += loss.item()
                         val_count += 1
@@ -638,8 +714,18 @@ class GNNTrainer:
         print(f"Modelo guardado en: {save_path}")
         print(f"{'='*60}\n")
     
-    def _convert_labeled_to_training(self, labeled_example: Dict) -> Dict:
-        """Convierte un ejemplo etiquetado al formato de entrenamiento"""
+    def _convert_labeled_to_training(self, labeled_example: Dict,
+                                     heuristic_edge_weight: float = 1.0) -> Dict:
+        """Convierte un ejemplo etiquetado al formato de entrenamiento.
+
+        heuristic_edge_weight: peso de las aristas RELLENADAS POR
+            HEURÍSTICA (sin edge_labels explícito) en la pérdida
+            ponderada. 1.0 = comportamiento original (todas las
+            aristas pesan igual). Bajar esto (ej. 0.2) reduce la
+            influencia de datos inventados frente a supervisión real.
+            Sin efecto si se usa WeightedHuberLoss (comportamiento
+            original) en vez de ConfidenceWeightedHuberLoss.
+        """
         
         # Crear grafo perceptual
         perceptual_graph = PerceptualGraph()
@@ -659,7 +745,9 @@ class GNNTrainer:
         
         # Crear array de factores óptimos
         optimal_factors = []
+        edge_weights = []
         edge_labels = labeled_example.get('edge_labels', {})
+        edge_confidences = labeled_example.get('edge_confidences', {})
         
         for u, v, key, data in semantic_graph.edges(keys=True, data=True):
             action = data.get('action', 'unknown')
@@ -668,63 +756,92 @@ class GNNTrainer:
             # Si hay etiqueta explícita, usarla
             if edge_key in edge_labels:
                 factor = edge_labels[edge_key]
+                # Confianza del clasificador si se proveyó, si no 1.0
+                # (etiqueta explícita se asume confiable por defecto)
+                weight = edge_confidences.get(edge_key, 1.0)
             else:
-                # Si no, usar heurística
+                # Si no, usar heurística -- esto es un valor INVENTADO,
+                # no una observación real, así que pesa menos si se usa
+                # ConfidenceWeightedHuberLoss
                 factor = self._compute_heuristic_factor(
                     u, v, action, labeled_example
                 )
+                weight = heuristic_edge_weight
             
             optimal_factors.append(factor)
+            edge_weights.append(weight)
         
         return {
             'semantic_graph': semantic_graph,
             'perceptual_graph': perceptual_graph,
             'goal': labeled_example['goal'],
-            'optimal_factors': np.array(optimal_factors, dtype=np.float32)
+            'optimal_factors': np.array(optimal_factors, dtype=np.float32),
+            'edge_weights': np.array(edge_weights, dtype=np.float32)
         }
     
     def _compute_heuristic_factor(self, u: str, v: str, action: str, 
                                    scenario: Dict) -> float:
-        """Calcula factor heurístico basado en el escenario"""
+        """
+        Calcula el factor de costo para aristas SIN edge_labels explícito
+        (la acción no se observó realmente en el video para ese par
+        objeto-objeto).
+
+        A diferencia de la versión anterior (que sorteaba un número
+        aleatorio dentro de un rango por categoría, sin relación con el
+        escenario real), esto es DETERMINÍSTICO: usa la distancia 3D real
+        entre los objetos (misma posición que ya calculó YOLO+Depth para
+        ese escenario, la misma fórmula que UnifiedPipeline.
+        _weight_from_distance) en vez de un número inventado. Dos
+        llamadas con el mismo escenario producen exactamente el mismo
+        factor -- reproducible, y trazable a percepción real, no a una
+        semilla aleatoria.
+        """
         target_set = set(scenario.get('target_objects', []))
         required_actions = set(scenario.get('required_actions', []))
         detected_set = set(scenario.get('detected_objects', []))
-        
+        positions = scenario.get('object_positions', {})
+
         source_concept = u.split('_')[0] if '_' in u else u
         target_concept = v.split('_')[0] if '_' in v else v
-        
-        # Heurística 1: Acción requerida hacia target object
+
+        distance = None
+        if source_concept in positions and target_concept in positions:
+            p1 = np.array(positions[source_concept])
+            p2 = np.array(positions[target_concept])
+            distance = float(np.linalg.norm(p1 - p2))
+
+        def with_distance(base: float, cap: float = 1.9) -> float:
+            """Igual que UnifiedPipeline._weight_from_distance: el costo
+            base sube con la distancia real entre los objetos. Sin datos
+            de posición, se aplica una penalización fija (no aleatoria)
+            en vez de adivinar."""
+            if distance is None:
+                return base + 0.3
+            return min(base + distance / 500.0, cap)
+
+        # Regla 1: acción requerida hacia un objeto objetivo -- el caso
+        # más plausible, costo base más bajo
         if target_concept in target_set and action in required_actions:
-            factor = np.random.uniform(0.15, 0.45)
-        # Heurística 2: Acción requerida
+            factor = with_distance(0.15)
+        # Regla 2: acción requerida, pero no hacia un objeto objetivo
         elif action in required_actions:
-            factor = np.random.uniform(0.4, 0.8)
-        # Heurística 3: Hacia target
+            factor = with_distance(0.35)
+        # Regla 3: hacia un objeto objetivo, pero con otra acción
         elif target_concept in target_set:
-            factor = np.random.uniform(0.6, 1.0)
-        # Heurística 4: Objetos detectados y cercanos
+            factor = with_distance(0.55)
+        # Regla 4: ambos objetos detectados en la escena, sin relación
+        # directa con el objetivo -- el costo depende solo de la distancia
         elif target_concept in detected_set and source_concept in detected_set:
-            if target_concept in scenario.get('object_positions', {}) and \
-               source_concept in scenario.get('object_positions', {}):
-                pos1 = np.array(scenario['object_positions'][source_concept])
-                pos2 = np.array(scenario['object_positions'][target_concept])
-                distance = np.linalg.norm(pos1 - pos2)
-                
-                if distance < 150:
-                    factor = np.random.uniform(0.6, 0.9)
-                else:
-                    factor = np.random.uniform(0.9, 1.3)
-            else:
-                factor = np.random.uniform(0.7, 1.2)
-        # Heurística 5: Objetos NO detectados
+            factor = with_distance(0.65)
+        # Regla 5: el objeto objetivo ni siquiera fue detectado en la
+        # escena -- penalización alta fija (no hay señal real que usar)
         elif target_concept not in detected_set:
-            factor = np.random.uniform(1.2, 1.9)
-        # Heurística 6: Irrelevante
+            factor = 1.6
+        # Regla 6: arista irrelevante para este escenario
         else:
-            factor = np.random.uniform(1.3, 1.95)
-        
-        factor += np.random.normal(0, 0.05)
-        return np.clip(factor, 0.1, 2.0)
+            factor = 1.75
+
+        return float(np.clip(factor, 0.1, 2.0))
     
     def generate_synthetic_training_data(self, n_examples: int = 50) -> List[Dict]:
         """

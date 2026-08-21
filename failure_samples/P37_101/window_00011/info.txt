@@ -1,0 +1,5 @@
+video_id: P37_101
+objeto: cupboard
+real: close
+predicho: move_to
+confianza: 0.437

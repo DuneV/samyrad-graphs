@@ -1,0 +1,5 @@
+video_id: P37_102
+objeto: carrot
+real: cut
+predicho: press
+confianza: 0.397

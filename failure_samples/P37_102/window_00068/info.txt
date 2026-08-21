@@ -1,0 +1,5 @@
+video_id: P37_102
+objeto: hand
+real: rotate
+predicho: move_to
+confianza: 0.563

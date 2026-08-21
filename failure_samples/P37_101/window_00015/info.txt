@@ -1,0 +1,5 @@
+video_id: P37_101
+objeto: towel:cleaning
+real: move_to
+predicho: press
+confianza: 0.684

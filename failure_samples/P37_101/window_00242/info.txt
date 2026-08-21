@@ -1,0 +1,5 @@
+video_id: P37_101
+objeto: bag:packing
+real: grasp
+predicho: move_to
+confianza: 0.600

@@ -23,6 +23,17 @@
     --videos vid1.mp4 \
     --train \
     --save-path gnn_cost_optimizer.pth
+
+  # Procesamiento por chunks (recomendado para videos largos / poca RAM):
+  # cada video se divide en tramos que se procesan en subprocesos aislados,
+  # evitando que una fuga de memoria (MediaPipe, YOLO, CLIP) tumbe todo el
+  # proceso a mitad de un video largo.
+  python3 collect_training_data.py \
+    --videos-dir ./videos/kitchen/ \
+    --model-path yoloe-11l-seg-pf.pt \
+    --info-path canonical.json \
+    --output output/mis_escenarios.json \
+    --chunked --chunk-frames 5000
 """
 
 import argparse
@@ -70,11 +81,15 @@ def scenario_from_video(video_path: str, run_name: str,
                          confidence: float = 0.5,
                          N: int = 5) -> dict:
     """
-    Procesa un video y devuelve un dict compatible con train_supervised().
+    Procesa un video COMPLETO en un solo proceso (comportamiento original).
+    Para videos largos o con poca RAM, usa scenario_from_video_chunked().
     """
+    import torch
     from videoAnalyzer import VideoAnalyzer
     from storyTelling import StoryTelling
     from unifiedPipeline2 import UnifiedPipeline
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     va = VideoAnalyzer(
         video       = video_path,
@@ -83,9 +98,10 @@ def scenario_from_video(video_path: str, run_name: str,
         model_path  = model_path,
         confidence  = confidence,
         info_path   = info_path,
-        alpha       = 0.5,  
+        alpha       = 0.5,
         N           = N,
         run_name    = run_name,
+        device      = device,
     )
     st = StoryTelling(
         video       = video_path,
@@ -96,6 +112,7 @@ def scenario_from_video(video_path: str, run_name: str,
         N           = N,
         run_name    = run_name,
         vlm_backend = "clip",
+        device      = device,
     )
 
     pipeline = UnifiedPipeline(va, st)
@@ -104,6 +121,33 @@ def scenario_from_video(video_path: str, run_name: str,
     scenario = pipeline.generate_scenario(goal=None)
     scenario = validate_scenario(scenario)
     pipeline.save(scenario)
+    return scenario
+
+
+def scenario_from_video_chunked(video_path: str, run_name: str,
+                                 model_path: str, info_path: str,
+                                 confidence: float = 0.5,
+                                 N: int = 5,
+                                 chunk_frames: int = 5000) -> dict:
+    """
+    Procesa un video dividiéndolo en tramos de `chunk_frames`, cada uno
+    en un subproceso aislado (process_chunk.py). Recomendado para videos
+    largos (>10-15k frames) o máquinas con RAM limitada, donde procesar
+    todo en un solo proceso Python de larga duración acumula memoria
+    hasta tumbar el sistema.
+    """
+    from chunked_pipeline import process_video_chunked
+
+    scenario = process_video_chunked(
+        video_path   = video_path,
+        run_name     = run_name,
+        model_path   = model_path,
+        info_path    = info_path,
+        chunk_frames = chunk_frames,
+        confidence   = confidence,
+        N            = N,
+    )
+    scenario = validate_scenario(scenario)
     return scenario
 
 
@@ -163,6 +207,13 @@ def main():
     parser.add_argument('--epochs',      type=int,   default=300)
     parser.add_argument('--no-synthetic',action='store_true',
                         help='No mezclar con training_data.py sintético')
+    parser.add_argument('--chunked',     action='store_true',
+                        help='Procesar cada video por chunks en subprocesos '
+                             'aislados (recomendado para videos largos / '
+                             'poca RAM, evita que una fuga de memoria '
+                             'tumbe todo el proceso a mitad de camino)')
+    parser.add_argument('--chunk-frames', type=int, default=5000,
+                        help='Tamaño de cada chunk en frames (solo con --chunked)')
     args = parser.parse_args()
 
     VIDEO_EXTS = {'.mp4', '.avi', '.mov', '.mkv', '.webm'}
@@ -190,25 +241,38 @@ def main():
         print(f"  {len(real_scenarios)} escenarios cargados")
 
     for i, video_path in enumerate(video_list):
-        print(f"\nProcesando video {i+1}/{len(video_list)}: {video_path}")
+        modo = "por chunks" if args.chunked else "completo (un solo proceso)"
+        print(f"\nProcesando video {i+1}/{len(video_list)} [{modo}]: {video_path}")
         run_name = Path(video_path).stem
         try:
-            scenario = scenario_from_video(
-                video_path = video_path,
-                run_name   = run_name,
-                model_path = args.model_path,
-                info_path  = args.info_path,
-                confidence = args.confidence,
-                N          = args.N,
-            )
+            if args.chunked:
+                scenario = scenario_from_video_chunked(
+                    video_path   = video_path,
+                    run_name     = run_name,
+                    model_path   = args.model_path,
+                    info_path    = args.info_path,
+                    confidence   = args.confidence,
+                    N            = args.N,
+                    chunk_frames = args.chunk_frames,
+                )
+            else:
+                scenario = scenario_from_video(
+                    video_path = video_path,
+                    run_name   = run_name,
+                    model_path = args.model_path,
+                    info_path  = args.info_path,
+                    confidence = args.confidence,
+                    N          = args.N,
+                )
             real_scenarios.append(scenario)
             print(f"  ✓ Escenario extraído:")
             print_scenario_summary(scenario)
+
+            # Guardado incremental: si un video posterior falla o se
+            # interrumpe, no perdés lo ya procesado.
+            save_scenarios_to_json(real_scenarios, args.output)
         except Exception as e:
             print(f"  ✗ Error: {e}")
-
-    if real_scenarios:
-        save_scenarios_to_json(real_scenarios, args.output)
 
     if args.train:
         from neopath.semantic_knowledge import KnowledgeBase

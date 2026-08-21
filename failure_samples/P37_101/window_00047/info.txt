@@ -1,0 +1,5 @@
+video_id: P37_101
+objeto: thigh:chicken
+real: grasp
+predicho: press
+confianza: 0.829

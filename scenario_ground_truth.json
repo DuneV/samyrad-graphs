@@ -1,0 +1,1433 @@
+{
+  "goal": "Perform robot task",
+  "detected_objects": [
+    "cucumber:sliced",
+    "tap",
+    "spatula",
+    "board:chopping",
+    "drawer",
+    "tray:plastic",
+    "fridge",
+    "box:plastic",
+    "lid",
+    "hand",
+    "bottle:cooking:wine",
+    "bowl",
+    "garlic:sliced",
+    "garlic:smashed",
+    "coriander",
+    "onion",
+    "bottle:soy:sauce",
+    "bag:packing",
+    "pan",
+    "towel:cleaning",
+    "stool",
+    "wine:cooking",
+    "skin:garlic",
+    "knife",
+    "garlic",
+    "switch",
+    "bottle",
+    "cucumber",
+    "bottle:oil",
+    "pot:cooking",
+    "thigh:chicken",
+    "hob:induction",
+    "cupboard"
+  ],
+  "target_objects": [
+    "cucumber:sliced",
+    "tap",
+    "spatula",
+    "board:chopping",
+    "drawer",
+    "tray:plastic",
+    "fridge",
+    "box:plastic",
+    "lid",
+    "hand",
+    "bottle:cooking:wine",
+    "bowl",
+    "garlic:sliced",
+    "garlic:smashed",
+    "coriander",
+    "onion",
+    "bottle:soy:sauce",
+    "bag:packing",
+    "pan",
+    "towel:cleaning",
+    "stool",
+    "wine:cooking",
+    "skin:garlic",
+    "knife",
+    "garlic",
+    "switch",
+    "bottle",
+    "cucumber",
+    "bottle:oil",
+    "pot:cooking",
+    "thigh:chicken",
+    "hob:induction",
+    "cupboard"
+  ],
+  "required_actions": [
+    "open",
+    "press",
+    "close",
+    "cut",
+    "rotate",
+    "grasp",
+    "move_to",
+    "remove_from"
+  ],
+  "object_positions": {
+    "fridge": [
+      1028.73046875,
+      840.9752655029297,
+      0.0
+    ],
+    "robot_right_hand": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "tray:plastic": [
+      1082.8882598876953,
+      889.171793460846,
+      0.0
+    ],
+    "stool": [
+      1471.937026977539,
+      842.3310256004333,
+      0.0
+    ],
+    "drawer": [
+      977.7074432373047,
+      971.4723086357117,
+      0.0
+    ],
+    "cupboard": [
+      1349.2303848266602,
+      478.16450357437134,
+      0.0
+    ],
+    "tap": [
+      738.3531761169434,
+      911.5434765815735,
+      0.0
+    ],
+    "towel:cleaning": [
+      1158.830337524414,
+      655.8591985702515,
+      0.0
+    ],
+    "knife": [
+      1230.6620407104492,
+      803.6089181900024,
+      0.0
+    ],
+    "box:plastic": [
+      901.0551452636719,
+      835.3656721115112,
+      0.0
+    ],
+    "bowl": [
+      1136.7753982543945,
+      364.83323335647583,
+      0.0
+    ],
+    "thigh:chicken": [
+      1185.0501251220703,
+      713.7609887123108,
+      0.0
+    ],
+    "switch": [
+      1270.9469604492188,
+      1041.4287185668945,
+      0.0
+    ],
+    "hob:induction": [
+      1328.433494567871,
+      994.6590185165405,
+      0.0
+    ],
+    "bottle:oil": [
+      1467.0988082885742,
+      555.890543460846,
+      0.0
+    ],
+    "garlic": [
+      1259.3122100830078,
+      133.6389210820198,
+      0.0
+    ],
+    "bottle:soy:sauce": [
+      1354.9312591552734,
+      884.5837354660034,
+      0.0
+    ],
+    "bottle:cooking:wine": [
+      927.1419525146484,
+      824.275553226471,
+      0.0
+    ],
+    "bottle": [
+      556.1172294616699,
+      781.3987469673157,
+      0.0
+    ],
+    "board:chopping": [
+      1484.9915313720703,
+      925.4486274719238,
+      0.0
+    ],
+    "cucumber": [
+      1304.813003540039,
+      973.5350131988525,
+      0.0
+    ],
+    "skin:garlic": [
+      850.7769584655762,
+      653.8918948173523,
+      0.0
+    ],
+    "pot:cooking": [
+      1475.4242706298828,
+      767.616548538208,
+      0.0
+    ],
+    "spatula": [
+      1393.8149642944336,
+      636.5006232261658,
+      0.0
+    ],
+    "garlic:sliced": [
+      847.8261566162109,
+      535.8067095279694,
+      0.0
+    ],
+    "pan": [
+      998.9872741699219,
+      740.692663192749,
+      0.0
+    ],
+    "wine:cooking": [
+      1465.9961700439453,
+      649.807620048523,
+      0.0
+    ],
+    "lid": [
+      1637.1887969970703,
+      641.4487838745117,
+      0.0
+    ],
+    "garlic:smashed": [
+      1002.2847747802734,
+      521.7046093940735,
+      0.0
+    ],
+    "bag:packing": [
+      1482.916374206543,
+      293.50194454193115,
+      0.0
+    ],
+    "coriander": [
+      1325.7840728759766,
+      745.0723457336426,
+      0.0
+    ],
+    "cucumber:sliced": [
+      1462.0994567871094,
+      762.1734881401062,
+      0.0
+    ],
+    "onion": [
+      785.8502197265625,
+      988.8337755203247,
+      0.0
+    ],
+    "hand": [
+      1187.3447799682617,
+      888.2575678825378,
+      0.0
+    ]
+  },
+  "edge_labels": {
+    "('robot_right_hand', 'open', 'fridge')": 0.3,
+    "('robot_right_hand', 'close', 'fridge')": 0.3,
+    "('robot_right_hand', 'move_to', 'tray:plastic')": 0.3,
+    "('robot_right_hand', 'move_to', 'stool')": 0.3,
+    "('robot_right_hand', 'open', 'drawer')": 0.3,
+    "('robot_right_hand', 'close', 'drawer')": 0.3,
+    "('robot_right_hand', 'open', 'cupboard')": 0.3,
+    "('robot_right_hand', 'close', 'cupboard')": 0.3,
+    "('robot_right_hand', 'press', 'tap')": 0.3,
+    "('robot_right_hand', 'move_to', 'towel:cleaning')": 0.3,
+    "('robot_right_hand', 'grasp', 'knife')": 0.3,
+    "('robot_right_hand', 'open', 'box:plastic')": 0.3,
+    "('robot_right_hand', 'grasp', 'bowl')": 0.3,
+    "('robot_right_hand', 'grasp', 'tray:plastic')": 0.3,
+    "('robot_right_hand', 'grasp', 'thigh:chicken')": 0.3,
+    "('robot_right_hand', 'move_to', 'bowl')": 0.3,
+    "('robot_right_hand', 'press', 'switch')": 0.3,
+    "('robot_right_hand', 'press', 'hob:induction')": 0.3,
+    "('robot_right_hand', 'grasp', 'bottle:oil')": 0.3,
+    "('robot_right_hand', 'grasp', 'garlic')": 0.3,
+    "('robot_right_hand', 'move_to', 'bottle:soy:sauce')": 0.3,
+    "('robot_right_hand', 'grasp', 'bottle:cooking:wine')": 0.3,
+    "('robot_right_hand', 'open', 'bottle')": 0.3,
+    "('robot_right_hand', 'close', 'bottle')": 0.3,
+    "('robot_right_hand', 'move_to', 'bottle')": 0.3,
+    "('robot_right_hand', 'move_to', 'garlic')": 0.3,
+    "('robot_right_hand', 'grasp', 'bottle')": 0.3,
+    "('robot_right_hand', 'grasp', 'board:chopping')": 0.3,
+    "('robot_right_hand', 'rotate', 'board:chopping')": 0.3,
+    "('robot_right_hand', 'move_to', 'board:chopping')": 0.3,
+    "('robot_right_hand', 'grasp', 'cucumber')": 0.3,
+    "('robot_right_hand', 'rotate', 'bowl')": 0.3,
+    "('robot_right_hand', 'cut', 'cucumber')": 0.3,
+    "('robot_right_hand', 'move_to', 'cucumber')": 0.3,
+    "('robot_right_hand', 'grasp', 'skin:garlic')": 0.3,
+    "('robot_right_hand', 'cut', 'skin:garlic')": 0.3,
+    "('robot_right_hand', 'rotate', 'pot:cooking')": 0.3,
+    "('robot_right_hand', 'grasp', 'spatula')": 0.3,
+    "('robot_right_hand', 'remove_from', 'garlic:sliced')": 0.3,
+    "('robot_right_hand', 'move_to', 'spatula')": 0.3,
+    "('robot_right_hand', 'grasp', 'pot:cooking')": 0.3,
+    "('robot_right_hand', 'move_to', 'pan')": 0.3,
+    "('robot_right_hand', 'open', 'wine:cooking')": 0.3,
+    "('robot_right_hand', 'close', 'lid')": 0.3,
+    "('robot_right_hand', 'move_to', 'bottle:cooking:wine')": 0.3,
+    "('robot_right_hand', 'move_to', 'garlic:smashed')": 0.3,
+    "('robot_right_hand', 'move_to', 'knife')": 0.3,
+    "('robot_right_hand', 'grasp', 'bag:packing')": 0.3,
+    "('robot_right_hand', 'grasp', 'coriander')": 0.3,
+    "('robot_right_hand', 'rotate', 'coriander')": 0.3,
+    "('robot_right_hand', 'cut', 'coriander')": 0.3,
+    "('robot_right_hand', 'remove_from', 'coriander')": 0.3,
+    "('robot_right_hand', 'grasp', 'cucumber:sliced')": 0.3,
+    "('robot_right_hand', 'move_to', 'cucumber:sliced')": 0.3,
+    "('robot_right_hand', 'grasp', 'onion')": 0.3,
+    "('robot_right_hand', 'rotate', 'onion')": 0.3,
+    "('robot_right_hand', 'cut', 'onion')": 0.3,
+    "('robot_right_hand', 'rotate', 'hand')": 0.3
+  },
+  "semantic_line": [
+    {
+      "action": "open",
+      "object": "fridge"
+    },
+    {
+      "action": "close",
+      "object": "fridge"
+    },
+    {
+      "action": "move_to",
+      "object": "tray:plastic"
+    },
+    {
+      "action": "move_to",
+      "object": "stool"
+    },
+    {
+      "action": "move_to",
+      "object": "stool"
+    },
+    {
+      "action": "open",
+      "object": "drawer"
+    },
+    {
+      "action": "open",
+      "object": "drawer"
+    },
+    {
+      "action": "close",
+      "object": "drawer"
+    },
+    {
+      "action": "close",
+      "object": "drawer"
+    },
+    {
+      "action": "open",
+      "object": "cupboard"
+    },
+    {
+      "action": "open",
+      "object": "cupboard"
+    },
+    {
+      "action": "close",
+      "object": "cupboard"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "move_to",
+      "object": "towel:cleaning"
+    },
+    {
+      "action": "move_to",
+      "object": "towel:cleaning"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "open",
+      "object": "drawer"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "open",
+      "object": "box:plastic"
+    },
+    {
+      "action": "open",
+      "object": "box:plastic"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "grasp",
+      "object": "tray:plastic"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "tray:plastic"
+    },
+    {
+      "action": "grasp",
+      "object": "tray:plastic"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "move_to",
+      "object": "bowl"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "switch"
+    },
+    {
+      "action": "press",
+      "object": "hob:induction"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle:oil"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle:oil"
+    },
+    {
+      "action": "grasp",
+      "object": "garlic"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle:cooking:wine"
+    },
+    {
+      "action": "open",
+      "object": "bottle"
+    },
+    {
+      "action": "close",
+      "object": "bottle"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle"
+    },
+    {
+      "action": "grasp",
+      "object": "garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "garlic"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle"
+    },
+    {
+      "action": "grasp",
+      "object": "board:chopping"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "rotate",
+      "object": "board:chopping"
+    },
+    {
+      "action": "move_to",
+      "object": "board:chopping"
+    },
+    {
+      "action": "grasp",
+      "object": "cucumber"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "rotate",
+      "object": "bowl"
+    },
+    {
+      "action": "move_to",
+      "object": "bowl"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber"
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "grasp",
+      "object": "garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "cucumber"
+    },
+    {
+      "action": "grasp",
+      "object": "cucumber"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "garlic"
+    },
+    {
+      "action": "grasp",
+      "object": "garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "rotate",
+      "object": "pot:cooking"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "cut",
+      "object": "skin:garlic"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "grasp",
+      "object": "spatula"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "remove_from",
+      "object": "garlic:sliced"
+    },
+    {
+      "action": "remove_from",
+      "object": "garlic:sliced"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "grasp",
+      "object": "spatula"
+    },
+    {
+      "action": "grasp",
+      "object": "spatula"
+    },
+    {
+      "action": "move_to",
+      "object": "spatula"
+    },
+    {
+      "action": "grasp",
+      "object": "pot:cooking"
+    },
+    {
+      "action": "grasp",
+      "object": "pot:cooking"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "move_to",
+      "object": "bowl"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "grasp",
+      "object": "thigh:chicken"
+    },
+    {
+      "action": "move_to",
+      "object": "pan"
+    },
+    {
+      "action": "move_to",
+      "object": "pan"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle:cooking:wine"
+    },
+    {
+      "action": "open",
+      "object": "wine:cooking"
+    },
+    {
+      "action": "close",
+      "object": "lid"
+    },
+    {
+      "action": "close",
+      "object": "lid"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:cooking:wine"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:cooking:wine"
+    },
+    {
+      "action": "move_to",
+      "object": "pan"
+    },
+    {
+      "action": "press",
+      "object": "hob:induction"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:soy:sauce"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "move_to",
+      "object": "bowl"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed"
+    },
+    {
+      "action": "move_to",
+      "object": "garlic:smashed"
+    },
+    {
+      "action": "move_to",
+      "object": "knife"
+    },
+    {
+      "action": "move_to",
+      "object": "knife"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "grasp",
+      "object": "bottle:cooking:wine"
+    },
+    {
+      "action": "close",
+      "object": "lid"
+    },
+    {
+      "action": "close",
+      "object": "lid"
+    },
+    {
+      "action": "move_to",
+      "object": "bottle:cooking:wine"
+    },
+    {
+      "action": "grasp",
+      "object": "bag:packing"
+    },
+    {
+      "action": "grasp",
+      "object": "bag:packing"
+    },
+    {
+      "action": "grasp",
+      "object": "coriander"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "rotate",
+      "object": "coriander"
+    },
+    {
+      "action": "grasp",
+      "object": "bowl"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "move_to",
+      "object": "bowl"
+    },
+    {
+      "action": "move_to",
+      "object": "bowl"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "grasp",
+      "object": "knife"
+    },
+    {
+      "action": "cut",
+      "object": "coriander"
+    },
+    {
+      "action": "cut",
+      "object": "coriander"
+    },
+    {
+      "action": "remove_from",
+      "object": "coriander"
+    },
+    {
+      "action": "remove_from",
+      "object": "coriander"
+    },
+    {
+      "action": "grasp",
+      "object": "cucumber:sliced"
+    },
+    {
+      "action": "grasp",
+      "object": "cucumber:sliced"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "cut",
+      "object": "cucumber"
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber:sliced"
+    },
+    {
+      "action": "move_to",
+      "object": "cucumber:sliced"
+    },
+    {
+      "action": "grasp",
+      "object": "onion"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "rotate",
+      "object": "onion"
+    },
+    {
+      "action": "cut",
+      "object": "onion"
+    },
+    {
+      "action": "cut",
+      "object": "onion"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "press",
+      "object": "tap"
+    },
+    {
+      "action": "rotate",
+      "object": "hand"
+    },
+    {
+      "action": "rotate",
+      "object": "hand"
+    }
+  ]
+}

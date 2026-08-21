@@ -34,17 +34,13 @@ class UnifiedPipeline:
                  ground_truth: Optional[EpicGroundTruth] = None,
                  checkpoint_every: Optional[int] = 1000,
                  checkpoint_dir: Optional[str] = None,
-                 keep_all_checkpoints: bool = False):
+                 keep_all_checkpoints: bool = False,
+                 memory_log_every: Optional[int] = 200):
         """
-        checkpoint_every      : cada cuántos frames guardar un checkpoint.
-                                 None o 0 desactiva el checkpointing.
-        checkpoint_dir        : carpeta de checkpoints. Por defecto
-                                 'checkpoints/<run_name>/'.
-        keep_all_checkpoints  : si True, guarda un archivo por checkpoint
-                                 (checkpoint_frame0001000.json, ...). Si
-                                 False (default), sobreescribe siempre
-                                 'checkpoint_latest.json' — más liviano
-                                 para videos largos.
+        memory_log_every : cada cuántos frames imprimir RAM del proceso y
+            VRAM de la GPU (si hay). None desactiva. Útil para diagnosticar
+            fugas de memoria: si estos números crecen sin parar frame tras
+            frame, hay algo acumulándose que no se está liberando.
         """
         self.va = va
         self.st = st
@@ -53,6 +49,8 @@ class UnifiedPipeline:
         self.checkpoint_every = checkpoint_every
         self.checkpoint_dir = Path(checkpoint_dir or f"checkpoints/{va.run_name}")
         self.keep_all_checkpoints = keep_all_checkpoints
+        self.memory_log_every = memory_log_every
+        self._memory_log_path = self.checkpoint_dir / "memory_log.csv"
 
         # Ground truth de EPIC-KITCHENS (opcional). Si se pasa aquí, se
         # propaga a StoryTelling y se detecta el video_id automáticamente
@@ -113,6 +111,10 @@ class UnifiedPipeline:
                         and framecounter % self.checkpoint_every == 0):
                     self._save_checkpoint(framecounter)
 
+                if (self.memory_log_every
+                        and framecounter % self.memory_log_every == 0):
+                    self._log_memory(framecounter)
+
         self.va.cap.release()
         self.va.out.release()
         cv2.destroyAllWindows()
@@ -123,6 +125,51 @@ class UnifiedPipeline:
         print(f"Eventos semánticos : {len(self.st.semantic_line)}")
         self._print_gt_vs_clip_stats()
         self.st.print_semantic_line()
+
+    def _log_memory(self, framecounter: int) -> None:
+        """
+        Registra RAM del proceso (RSS), VRAM (si hay CUDA), y el tamaño
+        de las estructuras que crecen frame a frame (scene, semantic_line,
+        vectors, confirmed). Se apila en checkpoint_dir/memory_log.csv
+        para poder graficar la tendencia después.
+        Si algo crece linealmente con framecounter sin estabilizarse,
+        ahí está la fuga.
+        """
+        try:
+            import psutil
+            proc = psutil.Process()
+            rss_mb = proc.memory_info().rss / (1024 ** 2)
+        except ImportError:
+            rss_mb = -1.0  # psutil no instalado
+
+        vram_alloc_mb = vram_reserved_mb = -1.0
+        try:
+            import torch
+            if torch.cuda.is_available():
+                vram_alloc_mb = torch.cuda.memory_allocated() / (1024 ** 2)
+                vram_reserved_mb = torch.cuda.memory_reserved() / (1024 ** 2)
+        except ImportError:
+            pass
+
+        n_scene = len(self.st.scene)
+        n_semantic = len(self.st.semantic_line)
+        n_vectors = len(self.va.vectors)
+        n_confirmed = len(self.va.confirmed)
+
+        self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        is_new = not self._memory_log_path.exists()
+        with open(self._memory_log_path, "a") as f:
+            if is_new:
+                f.write("frame,rss_mb,vram_alloc_mb,vram_reserved_mb,"
+                        "len_scene,len_semantic_line,len_vectors,len_confirmed\n")
+            f.write(f"{framecounter},{rss_mb:.1f},{vram_alloc_mb:.1f},"
+                    f"{vram_reserved_mb:.1f},{n_scene},{n_semantic},"
+                    f"{n_vectors},{n_confirmed}\n")
+
+        print(f"  [mem] frame {framecounter}: RSS={rss_mb:.0f}MB "
+              f"VRAM_alloc={vram_alloc_mb:.0f}MB VRAM_reserved={vram_reserved_mb:.0f}MB "
+              f"| scene={n_scene} semantic_line={n_semantic} "
+              f"vectors={n_vectors} confirmed={n_confirmed}")
 
     def _save_checkpoint(self, framecounter: int) -> None:
         """

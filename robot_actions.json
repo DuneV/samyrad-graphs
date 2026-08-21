@@ -1,0 +1,99 @@
+{
+  "actions": [
+    {
+      "name": "inspect",
+      "description": "Visually inspect an object",
+      "required_affordances": [
+        "inspectable"
+      ],
+      "preconditions": {
+        "robot_camera": "free"
+      },
+      "effects": {
+        "state": "inspected"
+      },
+      "cost": 1.0,
+      "risk_level": "low",
+      "tool_affordances": [],
+      "target_affordances": []
+    },
+    {
+      "name": "greet",
+      "description": "Greet a person.",
+      "required_affordances": [
+        "human"
+      ],
+      "preconditions": {
+        "robot_hand": "free"
+      },
+      "effects": {
+        "robot_hand": "holding"
+      },
+      "cost": 0.5,
+      "risk_level": "low",
+      "tool_affordances": [],
+      "target_affordances": []
+    },
+    {
+      "name": "search_for",
+      "description": "Visually search for an object using robot camera",
+      "required_affordances": [
+        "inspectable"
+      ],
+      "preconditions": {
+        "robot_camera": "holding"
+      },
+      "effects": {
+        "robot_camera": "searched"
+      },
+      "cost": 1.5,
+      "risk_level": "low",
+      "tool_affordances": [],
+      "target_affordances": []
+    },
+    {
+      "name": "move_to",
+      "description": "Move an object to a new location",
+      "required_affordances": [
+        "non_heavy_object",
+        "movable"
+      ],
+      "preconditions": {
+        "tool": false
+      },
+      "effects": {
+        "state": "moved"
+      },
+      "cost": 0.8,
+      "risk_level": "medium",
+      "tool_affordances": [],
+      "target_affordances": [
+        "placement_surface"
+      ]
+    },
+    {
+      "name": "cut",
+      "description": "Slice an object using a knife",
+      "required_affordances": [
+        "food",
+        "cuttable_object"
+      ],
+      "preconditions": {
+        "tool": true
+      },
+      "effects": {
+        "state": "cutted"
+      },
+      "cost": 2.0,
+      "risk_level": "medium",
+      "tool_affordances": [
+        "cutting_tool",
+        "sharp"
+      ],
+      "target_affordances": [
+        "food",
+        "cuttable_object"
+      ]
+    }
+  ]
+}

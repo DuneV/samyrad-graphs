@@ -1,0 +1,5 @@
+video_id: P37_102
+objeto: brush:dish
+real: grasp
+predicho: press
+confianza: 0.688

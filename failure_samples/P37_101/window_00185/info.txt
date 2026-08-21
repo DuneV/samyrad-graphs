@@ -1,0 +1,5 @@
+video_id: P37_101
+objeto: garlic:smashed
+real: move_to
+predicho: press
+confianza: 0.320

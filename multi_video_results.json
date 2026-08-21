@@ -1,0 +1,9 @@
+[
+  {
+    "video_id": "P37_101",
+    "n_events": 234,
+    "accuracy": 0.4017094017094017,
+    "time_gnn_classifier": 0.029973005002830178,
+    "time_gnn_oracle": 0.007428853990859352
+  }
+]

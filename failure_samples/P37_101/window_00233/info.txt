@@ -1,0 +1,5 @@
+video_id: P37_101
+objeto: hand
+real: rotate
+predicho: actuate
+confianza: 0.624

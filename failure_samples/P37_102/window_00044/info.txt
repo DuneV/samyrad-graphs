@@ -1,0 +1,5 @@
+video_id: P37_102
+objeto: carrot
+real: grasp
+predicho: move_to
+confianza: 0.772

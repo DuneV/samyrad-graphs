@@ -86,7 +86,18 @@ class VideoAnalyzer:
         device="cuda",
         trainedAIP="depth-anything/Depth-Anything-V2-Small-hf",
         trainedAMDE="depth-anything/Depth-Anything-V2-Small-hf",
+        store_depth_vectors: bool = False,
+        max_stored_vectors: Optional[int] = 500,
     ):
+        """
+        store_depth_vectors : si True, guarda depth_np de cada frame en
+            self.vectors para exportarlo luego con save(). En videos largos
+            (decenas de miles de frames) esto puede consumir decenas de GB
+            de RAM — por default está DESACTIVADO.
+        max_stored_vectors  : si store_depth_vectors=True, límite de frames
+            a mantener en memoria (ventana deslizante: se descartan los más
+            viejos). None = sin límite (¡cuidado en videos largos!).
+        """
         self.video = video
         self.path = path
         self.output = output_path
@@ -100,6 +111,9 @@ class VideoAnalyzer:
         self.alpha = alpha
         self.run_name = run_name
         self.N = N
+
+        self.store_depth_vectors = store_depth_vectors
+        self.max_stored_vectors = max_stored_vectors
 
         # Estado persistente entre frames
         self.confirmed: Dict[str, SpaceObject] = {}
@@ -138,6 +152,16 @@ class VideoAnalyzer:
             depth = self.modeldepth(**inputs).predicted_depth
         self.depth_np = depth.squeeze().cpu().numpy()
 
+        # Guardar el historial completo de profundidad por frame es MUY
+        # costoso en RAM para videos largos. Desactivado por default
+        # (store_depth_vectors=False). Si se activa, se usa una ventana
+        # deslizante (max_stored_vectors) en vez de crecer sin límite.
+        if self.store_depth_vectors:
+            self.vectors.append(self.depth_np)
+            if (self.max_stored_vectors is not None
+                    and len(self.vectors) > self.max_stored_vectors):
+                self.vectors.pop(0)
+
         result = self.modelvision(frame, conf=self.confidence, verbose=False)[0]
         seen_this_frame: set = set()
 
@@ -150,7 +174,8 @@ class VideoAnalyzer:
                 self._frame_counter[label] = self._frame_counter.get(label, 0) + 1
 
                 if self._frame_counter[label] >= self.N:
-                    if label not in self.confirmed:
+                    just_confirmed = label not in self.confirmed
+                    if just_confirmed:
                         self.confirmed[label] = SpaceObject(f"{label}-frame{framecounter}")
 
                     dh, dw = self.depth_np.shape
@@ -176,7 +201,15 @@ class VideoAnalyzer:
                         self.confirmed[label].update_pos(cx, cy, z0, label, scale=self.scale)
 
                     self.confirmed[label].update_mask(filter_mesh)
-                    self.confirmed[label].save(label, self.run_name)
+
+                    # Antes esto se guardaba en CADA frame una vez confirmado
+                    # el objeto (con timestamp único), generando cientos de
+                    # miles de archivos en videos largos. Ahora solo se
+                    # guarda al confirmarse por primera vez; las posiciones
+                    # actualizadas quedan reflejadas en los checkpoints
+                    # periódicos de UnifiedPipeline (confirmed_objects.json).
+                    if just_confirmed:
+                        self.confirmed[label].save(label, self.run_name)
 
         for lbl in list(self._frame_counter):
             if lbl not in seen_this_frame:
@@ -197,7 +230,6 @@ class VideoAnalyzer:
 
                 yolo_result, depth_np = self.process_frame(frame, framecounter)
 
-                self.vectors.append(depth_np)
                 annotated = yolo_result.plot()
                 self.out.write(annotated)
                 pbar.update(1)
@@ -208,9 +240,12 @@ class VideoAnalyzer:
         cv2.destroyAllWindows()
 
     def save(self, name):
-        self.vectors = np.array(self.vectors)
-        np.save(name, self.vectors)
-
+        if not self.vectors:
+            print("(store_depth_vectors=False o sin frames acumulados: "
+                  "no se guarda depth_vectors.npy)")
+            return
+        arr = np.array(self.vectors)
+        np.save(name, arr)
 
     def create_mask(self, croptype, *kargs):
         match croptype:
@@ -262,8 +297,17 @@ class VideoAnalyzer:
         elif fig.up_axis == "x":
             dist = (yy - cy) ** 2 + (zz - z0) ** 2
             return ((np.abs(xx - cx) <= LA / 2) & (dist <= radius ** 2)).astype(np.uint8)
+        elif fig.up_axis == "y":
+            # Eje "arriba" es y (imagen 2D): el cilindro se extiende en yy,
+            # la sección circular queda en el plano xx-zz (profundidad).
+            dist = (xx - cx) ** 2 + (zz - z0) ** 2
+            return ((np.abs(yy - cy) <= LA / 2) & (dist <= radius ** 2)).astype(np.uint8)
         else:
-            print(f"Warning not found: {fig.up_axis}")
+            # Solo avisa UNA vez por valor desconocido, no en cada frame
+            key = f"_warned_axis_{fig.up_axis}"
+            if not getattr(VideoAnalyzer, key, False):
+                print(f"Warning not found: {fig.up_axis}")
+                setattr(VideoAnalyzer, key, True)
             return None
 
     def convexmesh(self, alpha, mesh, object, center, name):

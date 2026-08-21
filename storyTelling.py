@@ -2,9 +2,11 @@ from tqdm import tqdm
 from ultralytics import YOLO
 import cv2
 import json
+import math
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Tuple, Dict, Optional
+from collections import deque
 import torch
 import numpy as np
 from PIL import Image
@@ -78,24 +80,126 @@ class Graph:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# HandTrajectory
+# ──────────────────────────────────────────────────────────────────────────────
+
+class HandTrajectory:
+    """
+    Rastrea, por mano, la posición 2D de la muñeca, el tamaño del bbox del
+    objeto con el que interactúa, y la ORIENTACIÓN de la mano (ángulo del
+    vector muñeca -> nudillo medio), en una ventana deslizante. Se usa para
+    desambiguar grasp/push/pull/rotate por MOVIMIENTO, donde CLIP zero-shot
+    demostró ser poco confiable (ver evaluate_chunks_against_gt.py).
+
+    Heurística:
+      - Poco desplazamiento neto + poco cambio de ángulo -> 'grasp'
+        (mano de verdad quieta)
+      - Poco desplazamiento neto + cambio de ángulo grande -> 'rotate'
+        (mano gira en el sitio: perilla, tapa, muñeca girando el objeto)
+      - Camino curvo (traslación) respecto al desplazamiento neto -> 'rotate'
+      - Camino lineal + bbox del objeto CRECE (se acerca a cámara) -> 'pull'
+      - Camino lineal + bbox del objeto DECRECE (se aleja) -> 'push'
+      - Si no hay suficientes frames -> 'unknown' (CLIP decide)
+    """
+
+    def __init__(self, window_size: int = 8,
+                 static_threshold_px: float = 12.0,
+                 curvature_threshold: float = 0.5,
+                 area_change_threshold: float = 0.08,
+                 angle_threshold_deg: float = 15.0):
+        self.window_size = window_size
+        self.static_threshold_px = static_threshold_px
+        self.curvature_threshold = curvature_threshold
+        self.area_change_threshold = area_change_threshold
+        self.angle_threshold_deg = angle_threshold_deg
+        self._positions: Dict[str, deque] = {}
+        self._areas: Dict[str, deque] = {}
+        self._angles: Dict[str, deque] = {}
+
+    def update(self, hand_label: str, wx: int, wy: int,
+               obj_bbox: Optional[Tuple[int, int, int, int]] = None,
+               orientation_point: Optional[Tuple[int, int]] = None) -> None:
+        if hand_label not in self._positions:
+            self._positions[hand_label] = deque(maxlen=self.window_size)
+            self._areas[hand_label] = deque(maxlen=self.window_size)
+            self._angles[hand_label] = deque(maxlen=self.window_size)
+        self._positions[hand_label].append((wx, wy))
+        if obj_bbox is not None:
+            xmin, ymin, xmax, ymax = obj_bbox
+            area = max(0, xmax - xmin) * max(0, ymax - ymin)
+            self._areas[hand_label].append(area)
+        if orientation_point is not None:
+            ox, oy = orientation_point
+            angle = math.atan2(oy - wy, ox - wx)
+            self._angles[hand_label].append(angle)
+
+    def reset(self, hand_label: str) -> None:
+        self._positions.pop(hand_label, None)
+        self._areas.pop(hand_label, None)
+        self._angles.pop(hand_label, None)
+
+    @staticmethod
+    def _angular_range(angles: List[float]) -> float:
+        """Suma de los cambios angulares absolutos frame a frame (grados),
+        manejando correctamente el wraparound de -pi/pi."""
+        if len(angles) < 2:
+            return 0.0
+        total = 0.0
+        for a, b in zip(angles[:-1], angles[1:]):
+            d = b - a
+            d = (d + math.pi) % (2 * math.pi) - math.pi
+            total += abs(d)
+        return math.degrees(total)
+
+    def classify_motion(self, hand_label: str) -> Tuple[str, float]:
+        positions = self._positions.get(hand_label)
+        if positions is None or len(positions) < self.window_size:
+            return "unknown", 0.0
+
+        pts = np.array(positions, dtype=float)
+        net_disp = float(np.linalg.norm(pts[-1] - pts[0]))
+        path_length = float(np.sum(np.linalg.norm(np.diff(pts, axis=0), axis=1)))
+
+        angles = list(self._angles.get(hand_label, []))
+        angular_range = (self._angular_range(angles)
+                         if len(angles) >= self.window_size else None)
+
+        if net_disp < self.static_threshold_px:
+            # Mano no se traslada, pero puede estar rotando en el sitio
+            if angular_range is not None and angular_range > self.angle_threshold_deg:
+                confidence = min(angular_range / (self.angle_threshold_deg * 3), 1.0)
+                return "rotate", round(confidence, 2)
+            confidence = 1.0 - (net_disp / self.static_threshold_px)
+            return "grasp", round(max(confidence, 0.3), 2)
+
+        curvature = 0.0 if net_disp == 0 else (path_length / net_disp) - 1.0
+        if curvature > self.curvature_threshold:
+            confidence = min(curvature / (self.curvature_threshold * 2), 1.0)
+            return "rotate", round(confidence, 2)
+
+        areas = self._areas.get(hand_label)
+        if areas and len(areas) >= 2 and areas[0] > 0:
+            area_change = (areas[-1] - areas[0]) / areas[0]
+            if abs(area_change) >= self.area_change_threshold:
+                action = "pull" if area_change > 0 else "push"
+                confidence = min(abs(area_change) / (self.area_change_threshold * 3), 1.0)
+                return action, round(confidence, 2)
+
+        return "unknown", 0.0
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # VLMEncoder
 # ──────────────────────────────────────────────────────────────────────────────
 
 class VLMEncoder:
-    """
-    Clasifica la acción que realiza una mano sobre un objeto.
-
-    backend='clip'  : zero-shot, rápido (~30 ms/frame), ~1 GB VRAM.
-    backend='llava' : LLaVA-1.5-7B, lento (~1 s/frame), ~8 GB VRAM.
-                      Requiere: pip install accelerate bitsandbytes
-    """
-
-    def __init__(self, backend: str = "clip", device: str = "cuda"):
+    def __init__(self, backend: str = "clip", device: str = "cuda",
+                 model_id: str = "openai/clip-vit-base-patch32"):
         self.backend = backend
         self.device = device
 
         if backend == "clip":
-            model_id = "openai/clip-vit-base-patch32"
+            self.model_id = model_id
             self.processor = CLIPProcessor.from_pretrained(model_id)
             self.model = CLIPModel.from_pretrained(model_id).to(device)
             self.model.eval()
@@ -105,42 +209,31 @@ class VLMEncoder:
             model_id = "llava-hf/llava-v1.6-mistral-7b-hf"
             self.processor = LlavaNextProcessor.from_pretrained(model_id)
             self.model = LlavaNextForConditionalGeneration.from_pretrained(
-                model_id,
-                torch_dtype=torch.float16,
-                load_in_4bit=True,
-                device_map="auto",
+                model_id, torch_dtype=torch.float16,
+                load_in_4bit=True, device_map="auto",
             )
-
         else:
-            raise ValueError(f"Backend no soportado: '{backend}'. Usa 'clip' o 'llava'.")
+            raise ValueError(f"Backend no soportado: '{backend}'.")
 
     @torch.no_grad()
     def classify_action(self, crop_bgr: np.ndarray) -> Tuple[str, float]:
-        """
-        Recibe un crop BGR, devuelve (action_type, confidence).
-        action_type coincide con los tipos usados en edge_labels.
-        """
         pil_img = Image.fromarray(cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB))
-
         if self.backend == "clip":
             inputs = self.processor(
-                text=CANDIDATE_ACTIONS,
-                images=pil_img,
-                return_tensors="pt",
-                padding=True,
+                text=CANDIDATE_ACTIONS, images=pil_img,
+                return_tensors="pt", padding=True,
             ).to(self.device)
             logits = self.model(**inputs).logits_per_image
             probs = logits.softmax(dim=-1).squeeze()
             best_idx = int(probs.argmax())
             description = CANDIDATE_ACTIONS[best_idx]
             return CLIP_TO_ACTION[description], float(probs[best_idx])
-
         elif self.backend == "llava":
             prompt = (
-                "[INST] <image>\n"
-                "In ONE short phrase (max 8 words), what action is the hand performing? "
-                "Choose from: grasp, move_to, pour, cut, open, close, push, pull, "
-                "press, rotate, inspect, remove_from. [/INST]"
+                "[INST] <image>\nIn ONE short phrase (max 8 words), what "
+                "action is the hand performing? Choose from: grasp, move_to, "
+                "pour, cut, open, close, push, pull, press, rotate, inspect, "
+                "remove_from. [/INST]"
             )
             inputs = self.processor(prompt, pil_img, return_tensors="pt").to(self.device)
             out = self.model.generate(**inputs, max_new_tokens=20)
@@ -150,14 +243,11 @@ class VLMEncoder:
                 if act.replace("_", " ") in text:
                     action = act
                     break
-            return action, 0.0   # LLaVA no da probabilidad directa
+            return action, 0.0
 
     @staticmethod
-    def make_crop(frame_bgr: np.ndarray,
-                  hand_wrist: Tuple[int, int],
-                  obj_bbox: Tuple[int, int, int, int],
-                  padding: int = 80) -> np.ndarray:
-        """Crop mínimo que encierra la muñeca y el bbox del objeto."""
+    def make_crop(frame_bgr: np.ndarray, hand_wrist: Tuple[int, int],
+                  obj_bbox: Tuple[int, int, int, int], padding: int = 80) -> np.ndarray:
         h, w = frame_bgr.shape[:2]
         wx, wy = hand_wrist
         xmin, ymin, xmax, ymax = obj_bbox
@@ -190,13 +280,14 @@ class StoryTelling:
         self.run_name = run_name
         self.confirmed = {}
         self.scene = []
-        self.semantic_line: List[Dict] = []   # eventos clasificados por VLM
+        self.semantic_line: List[Dict] = []
 
-        # Estado de confirmación de manos entre frames
         self._frame_counter: Dict[str, int] = {}
 
-        # VLMEncoder para clasificar acciones (SIEMPRE se usa para predecir)
         self.vlm = VLMEncoder(backend=vlm_backend, device=device)
+
+        self.trajectory = HandTrajectory()
+        self._motion_refined_actions = {"grasp", "push", "pull", "rotate"}
 
         options = HandLandmarkerOptions(
             base_options=mp.tasks.BaseOptions(model_asset_path="hand_landmarker.task"),
@@ -205,7 +296,10 @@ class StoryTelling:
             min_hand_detection_confidence=confidence,
             min_tracking_confidence=confidence,
         )
+        self._hand_options = options
         self.hands = HandLandmarker.create_from_options(options)
+        self.reinit_hands_every = 2000
+        self._frames_since_hand_reinit = 0
 
     def get_video_info(self):
         self.cap = cv2.VideoCapture(self.path)
@@ -217,29 +311,28 @@ class StoryTelling:
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         self.out = cv2.VideoWriter(self.output, fourcc, self.fps, (self.width, self.height))
 
-    def process_frame_hands(
-        self,
-        frame: np.ndarray,
-        yolo_result,
-        framecounter: int,
-    ) -> Optional[Dict]:
-        """
-        Corre MediaPipe sobre el frame.
-        Recibe yolo_result ya calculado (de VideoAnalyzer o del pipeline propio).
-        Si hay interacción mano-objeto, SIEMPRE clasifica la acción con
-        VLMEncoder (CLIP/LLaVA). Si hay ground truth de EPIC-KITCHENS
-        disponible para ese frame, se guarda aparte (gt_action) solo para
-        comparar después con evaluate_detector_vs_gt() — nunca reemplaza
-        la predicción del detector.
-        Devuelve dict de frame o None si no hay manos confirmadas.
-        """
+    def _maybe_reinit_hand_landmarker(self) -> None:
+        if not self.reinit_hands_every:
+            return
+        self._frames_since_hand_reinit += 1
+        if self._frames_since_hand_reinit >= self.reinit_hands_every:
+            try:
+                self.hands.close()
+            except Exception:
+                pass
+            self.hands = HandLandmarker.create_from_options(self._hand_options)
+            self._frames_since_hand_reinit = 0
+            import gc
+            gc.collect()
+
+    def process_frame_hands(self, frame: np.ndarray, yolo_result,
+                             framecounter: int) -> Optional[Dict]:
+        self._maybe_reinit_hand_landmarker()
         timestamp_ms = int(framecounter * 1000 / self.fps)
 
         current_frame_data = {
-            "frame_index": framecounter,
-            "timestamp_ms": timestamp_ms,
-            "hands": [],
-            "objects": [],
+            "frame_index": framecounter, "timestamp_ms": timestamp_ms,
+            "hands": [], "objects": [],
         }
 
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -249,7 +342,6 @@ class StoryTelling:
         if not mp_results.hand_landmarks:
             return None
 
-        # Extrae bboxes del yolo_result recibido
         boxes, clss, confs, masks_xy = [], [], [], None
         if yolo_result.boxes is not None:
             boxes    = yolo_result.boxes.xyxy.cpu().numpy()
@@ -264,7 +356,6 @@ class StoryTelling:
             label = f"{handedness.category_name.lower()}_hand"
             seen_hands.add(label)
             self._frame_counter[label] = self._frame_counter.get(label, 0) + 1
-
             if self._frame_counter[label] < self.N:
                 continue
 
@@ -276,22 +367,22 @@ class StoryTelling:
                 py = int(lm.y * self.height)
                 hand_px.append((px, py))
                 keypoints[kname] = {
-                    "x_pixel": px, "y_pixel": py,
-                    "z_depth": float(lm.z),
+                    "x_pixel": px, "y_pixel": py, "z_depth": float(lm.z),
                     "x_norm": float(lm.x), "y_norm": float(lm.y),
                 }
 
             wx = int(hand_landmarks[0].x * self.width)
             wy = int(hand_landmarks[0].y * self.height)
+            # Punto de referencia para el ángulo de orientación de la mano
+            mid_mcp = keypoints["MIDDLE_FINGER_MCP"]
+            orientation_point = (mid_mcp["x_pixel"], mid_mcp["y_pixel"])
 
             hand_entry = {
-                "label": label,
-                "wrist_center": [wx, wy],
+                "label": label, "wrist_center": [wx, wy],
                 "confidence": round(float(handedness.score), 4),
                 "keypoints": keypoints,
             }
 
-            # ── Interacciones con objetos ──────────────────────────────
             interactions = []
             for idx, box in enumerate(boxes):
                 xmin, ymin, xmax, ymax = map(int, box)
@@ -305,12 +396,20 @@ class StoryTelling:
                     for px, py in hand_px
                 )
                 if touching:
-                    # ── Clasificación de acción con VLM (SIEMPRE) ──────
+                    self.trajectory.update(
+                        label, wx, wy, (xmin, ymin, xmax, ymax),
+                        orientation_point=orientation_point,
+                    )
+
                     crop = VLMEncoder.make_crop(frame, (wx, wy),
                                                 (xmin, ymin, xmax, ymax))
                     action, action_conf = self.vlm.classify_action(crop)
 
-                    # ── Ground truth SOLO para comparar, no reemplaza ──
+                    if action in self._motion_refined_actions:
+                        motion_action, motion_conf = self.trajectory.classify_motion(label)
+                        if motion_action != "unknown":
+                            action, action_conf = motion_action, motion_conf
+
                     gt_action = None
                     if self.gt is not None and self.video_id is not None:
                         seg = self.gt.segment_at_frame(self.video_id, framecounter)
@@ -318,24 +417,25 @@ class StoryTelling:
                             gt_action = EPIC_TO_ROBOT.get(seg.verb)
 
                     interactions.append({
-                        "object":         obj_label,
-                        "confidence":     round(float(confs[idx]), 4),
-                        "bbox":           [xmin, ymin, xmax, ymax],
-                        "polygon":        (masks_xy[idx].astype(int).tolist()
-                                           if masks_xy is not None else []),
-                        "action":         action,
-                        "action_conf":    round(action_conf, 4),
-                        "gt_action":      gt_action,
+                        "object": obj_label,
+                        "confidence": round(float(confs[idx]), 4),
+                        "bbox": [xmin, ymin, xmax, ymax],
+                        "polygon": (masks_xy[idx].astype(int).tolist()
+                                   if masks_xy is not None else []),
+                        "action": action,
+                        "action_conf": round(action_conf, 4),
+                        "gt_action": gt_action,
                     })
 
-                    # Agrega a la línea semántica (deduplica eventos iguales)
                     self._add_semantic_event(
                         framecounter, timestamp_ms, label, action, obj_label,
-                        action_conf, gt_action
+                        action_conf, gt_action,
                     )
 
             if interactions:
                 hand_entry["interacting_with"] = interactions
+            else:
+                self.trajectory.reset(label)
 
             current_frame_data["hands"].append(hand_entry)
 
@@ -349,31 +449,20 @@ class StoryTelling:
 
         if not current_frame_data["hands"]:
             return None
-
         return current_frame_data
 
-    def _add_semantic_event(self, frame_index, timestamp_ms,
-                             hand, action, obj_label, action_conf,
+    def _add_semantic_event(self, frame_index, timestamp_ms, hand, action,
+                             obj_label, action_conf,
                              gt_action: Optional[str] = None) -> None:
-        """Agrega un evento a self.semantic_line evitando repetidos consecutivos.
-        action     : predicción del detector (CLIP/LLaVA) — la que usa el resto
-                     del pipeline (edge_labels, entrenamiento del GNN).
-        gt_action  : ground truth de EPIC-KITCHENS si está disponible — SOLO
-                     para evaluate_detector_vs_gt(), nunca sustituye a action.
-        """
         if self.semantic_line:
             last = self.semantic_line[-1]
             if (last["hand"] == hand and last["action"] == action
                     and last["object"] == obj_label):
                 return
         self.semantic_line.append({
-            "frame_index":  frame_index,
-            "timestamp_ms": timestamp_ms,
-            "hand":         hand,
-            "action":       action,
-            "object":       obj_label,
-            "action_conf":  round(action_conf, 4),
-            "gt_action":    gt_action,
+            "frame_index": frame_index, "timestamp_ms": timestamp_ms,
+            "hand": hand, "action": action, "object": obj_label,
+            "action_conf": round(action_conf, 4), "gt_action": gt_action,
         })
 
     def print_semantic_line(self) -> None:
@@ -387,21 +476,13 @@ class StoryTelling:
         print("──────────────────────────────────────────────────────────\n")
 
     def evaluate_detector_vs_gt(self) -> Optional[Dict]:
-        """
-        Compara las predicciones del detector (self.vlm) contra el ground
-        truth de EPIC-KITCHENS. Solo evalúa eventos donde hay gt_action
-        disponible (es decir, videos de EPIC-KITCHENS con self.gt/
-        self.video_id seteados). Devuelve None si no hay nada que comparar.
-        """
         pairs = [(e["action"], e["gt_action"]) for e in self.semantic_line
                  if e.get("gt_action") is not None]
         if not pairs:
             return None
-
         from collections import defaultdict
         total = len(pairs)
         correct = sum(1 for pred, gt in pairs if pred == gt)
-
         confusion = defaultdict(lambda: defaultdict(int))
         per_class_total = defaultdict(int)
         per_class_correct = defaultdict(int)
@@ -410,10 +491,8 @@ class StoryTelling:
             per_class_total[gt] += 1
             if pred == gt:
                 per_class_correct[gt] += 1
-
         return {
-            "total": total,
-            "correct": correct,
+            "total": total, "correct": correct,
             "accuracy": round(correct / total, 3),
             "per_class_accuracy": {
                 c: round(per_class_correct[c] / per_class_total[c], 3)
@@ -425,78 +504,49 @@ class StoryTelling:
     def print_evaluation(self) -> None:
         result = self.evaluate_detector_vs_gt()
         if result is None:
-            print("Sin ground truth para evaluar (video no es de EPIC-KITCHENS "
-                  "o self.gt/self.video_id no están seteados).")
+            print("Sin ground truth para evaluar.")
             return
-        print("\n── Evaluación detector vs. ground truth ─────────────────")
-        print(f"  Accuracy global: {result['accuracy']*100:.1f}%  "
+        print(f"\nAccuracy global: {result['accuracy']*100:.1f}% "
               f"({result['correct']}/{result['total']})")
-        print("  Accuracy por acción (ground truth):")
         for cls, acc in sorted(result["per_class_accuracy"].items()):
             print(f"    {cls:12s}: {acc*100:.1f}%")
-        print("  Matriz de confusión (fila=ground truth, columna=predicción):")
-        for gt_cls, preds in sorted(result["confusion_matrix"].items()):
-            print(f"    {gt_cls:12s}: {dict(preds)}")
-        print("──────────────────────────────────────────────────────────\n")
 
     def create_story(self, data: Dict) -> Graph:
-        """
-        Construye un Graph a partir de un dict de escenario.
-        data debe tener: object_positions, target_objects,
-                         edge_labels, detected_objects.
-        """
         graph = Graph()
-
         for obj_label, pos in data.get("object_positions", {}).items():
             graph.nodes.append(Node(
-                name=obj_label,
-                position=tuple(pos),
+                name=obj_label, position=tuple(pos),
                 is_target=(obj_label in data.get("target_objects", [])),
             ))
-
-        robot_parts = {
-            src
-            for (src, _, _) in data.get("edge_labels", {})
-            if src.startswith("robot_")
-        }
+        robot_parts = {src for (src, _, _) in data.get("edge_labels", {})
+                       if src.startswith("robot_")}
         for rp in robot_parts:
             graph.nodes.append(Node(name=rp, position=(0.0, 0.0, 0.0), is_target=False))
-
         for (src, action_type, tgt), weight in data.get("edge_labels", {}).items():
-            graph.actions.append(Action(
-                source=src, action_type=action_type, target=tgt, weight=weight,
-            ))
-
+            graph.actions.append(Action(source=src, action_type=action_type,
+                                        target=tgt, weight=weight))
         detected = data.get("detected_objects", [])
         for i, a in enumerate(detected):
             for b in detected[i + 1:]:
                 graph.relations.append((a, "co_detected", b))
-
         return graph
 
     def pipeline(self):
-        """Pipeline standalone de StoryTelling (sin VideoAnalyzer)."""
         self.get_video_info()
         framecounter = 0
-
         with tqdm(total=self.total_frames, desc="StoryTelling", unit="frame") as pbar:
             while self.cap.isOpened():
                 self.ret, self.frame = self.cap.read()
                 if not self.ret:
                     break
-
-                # YOLO corre una sola vez por frame
                 yolo_result = self.modelpose(self.frame, conf=self.confidence, verbose=False)[0]
-
                 frame_data = self.process_frame_hands(self.frame, yolo_result, framecounter)
                 if frame_data is not None:
                     self.scene.append(frame_data)
-
                 annotated = yolo_result.plot(img=self.frame)
                 self.out.write(annotated)
                 pbar.update(1)
                 framecounter += 1
-
         self.cap.release()
         self.out.release()
         cv2.destroyAllWindows()
@@ -509,23 +559,15 @@ class StoryTelling:
             json.dump(self.scene, f, indent=4)
         with open(f"output/{self.run_name}/semantic_line.json", "w") as f:
             json.dump(self.semantic_line, f, indent=4)
-        print(f"Scene guardado: output/{self.run_name}/scene.json")
-        print(f"Línea semántica: output/{self.run_name}/semantic_line.json")
 
 
 if __name__ == "__main__":
     base_folder = Path(__file__).resolve().parent
-    ws = base_folder.parent.parent
-
     story = StoryTelling(
-        video="test.mp4",
-        path=str(base_folder / "test.mp4"),
+        video="test.mp4", path=str(base_folder / "test.mp4"),
         output_path=str(base_folder / "output_mediapipe.mp4"),
-        model_path="yoloe-11l-seg-pf.pt",
-        confidence=0.5,
-        N=5,
-        run_name="prueba_hibrida",
-        vlm_backend="clip",   # cambia a "llava" si tienes 8 GB VRAM
+        model_path="yoloe-11l-seg-pf.pt", confidence=0.5, N=5,
+        run_name="prueba_hibrida", vlm_backend="clip",
     )
     story.pipeline()
     story.save_scene()

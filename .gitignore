@@ -7,6 +7,15 @@ b/
 output/
 *.mp4
 *.avi
+/kitchen
+/chunks
+/crops_cache
+*.joblib
+*.pth
+*.npz
+**/*.joblib
+**/*.pth
+**/*.npz
 
 # --- Datos Numéricos y Archivos de MediaPipe/Modelos ---
 *.npy

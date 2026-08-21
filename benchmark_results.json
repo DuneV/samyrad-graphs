@@ -1,0 +1,18 @@
+{
+  "A_pipeline_clasificador": {
+    "tiempo_percepcion_seg": NaN,
+    "tiempo_gnn_seg": 0.06886984199809376,
+    "tiempo_total_seg": 0.06886984199809376,
+    "n_acciones_predichas": 279,
+    "accuracy_vs_ground_truth": 0.4752475247524752
+  },
+  "B_ground_truth_oracle": {
+    "tiempo_scenario_seg": 0.0017082750127883628,
+    "tiempo_gnn_seg": 0.007443238006089814,
+    "tiempo_total_seg": 0.009151513018878177,
+    "n_acciones_reales": 202
+  },
+  "C_vla": {
+    "status": "saltado (--skip-vla), correr aparte en otro servidor"
+  }
+}
